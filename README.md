@@ -5,6 +5,8 @@ Prérequis:
 Installation:
 * cd UEXChatBot
 * npm install esm
+* npm install tmi
+* npm install node-fetch
 
 Configuration:
 * Récupérer une clé API sur https://uexcorp.space/api.html
