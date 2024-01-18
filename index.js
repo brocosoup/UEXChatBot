@@ -63,10 +63,10 @@ function getShipList(shipName) {
 	return shipsList;
 }
 
-function getNbLoc(shipName) {
+function getNbLoc(shipName,type) {
 	var nbLocs = 0
 	for(var ship in jsonData.data) {
-		for (var loc in jsonData.data[ship]['buy_at']) {
+		for (var loc in jsonData.data[ship][type + '_at']) {
 			if (jsonData.data[ship]['name'].toLowerCase() == shipName.toLowerCase()) {
 				nbLocs = nbLocs + 1
 			}
@@ -76,12 +76,12 @@ function getNbLoc(shipName) {
 }
 
 
-function getShipPrice(shipName) {
+function getShipPrice(shipName,type) {
 	var listShips = getShipList(shipName);
 	var nbShips = listShips.length;
 	var message = '';
 	if (listShips.length == 1) {
-		var nbLocs = getNbLoc(listShips[0]);
+		var nbLocs = getNbLoc(listShips[0],type);
 		console.log('Looking for \'' + listShips[0] + '\' and found ' + nbLocs + ' locations');
 		var message = '';
 		if (nbLocs == 0)
@@ -93,24 +93,34 @@ function getShipPrice(shipName) {
 				if (jsonData.data[ship]['name'].toLowerCase() == listShips[0].toLowerCase()) 
 				{
 					console.log('Found ship \'' + listShips[0] + '\'');
-					for (var loc in jsonData.data[ship]['buy_at']) 
+					for (var loc in jsonData.data[ship][type + '_at']) 
 					{
 						console.log(nbLocs + '/' + locID);
+						var apiShipName = jsonData.data[ship]['name'];
+						var locSystemName = jsonData.data[ship][type + '_at'][loc]['system_name'];
+						var locCityName = jsonData.data[ship][type + '_at'][loc]['city_name'];
+						if (locCityName == undefined)
+							locCityName = jsonData.data[ship][type + '_at'][loc]['tradeport'];								
+						var locStoreName = '(' + jsonData.data[ship][type + '_at'][loc]['store_name'] + ')';
+						if (locStoreName == '()')
+							locStoreName = '';	
+						var apiShipPrice = jsonData.data[ship][type + '_at'][loc]['price'].toLocaleString('en-US') + ' aUEC'
 						if (nbLocs == 1)
 						{
-							message = 'Le ' + jsonData.data[ship]['name'] + ' est disponible dans ' + jsonData.data[ship]['buy_at'][loc]['system_name'] + ' à ' + jsonData.data[ship]['buy_at'][loc]['city_name'] + ' (' + jsonData.data[ship]['buy_at'][loc]['store_name'] + ') au prix de ' + jsonData.data[ship]['buy_at'][loc]['price'].toLocaleString('en-US') + ' aUEC';
+							
+							message = 'Le ' + apiShipName + ' est disponible dans ' + locSystemName + ' à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
 							locID = locID + 1;
 						}
 						else if (nbLocs > 1)
 						{
 							if (locID == 1) {
-								message = 'Le ' + jsonData.data[ship]['name'] + ' est disponible dans ' + jsonData.data[ship]['buy_at'][loc]['system_name'] + ' à ' + jsonData.data[ship]['buy_at'][loc]['city_name'] + ' (' + jsonData.data[ship]['buy_at'][loc]['store_name'] + ') au prix de ' + jsonData.data[ship]['buy_at'][loc]['price'].toLocaleString('en-US') + ' aUEC';
+								message = message = 'Le ' + apiShipName + ' est disponible dans ' + locSystemName + ' à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
 								locID = locID + 1;
 							} else if (locID == nbLocs)
 							{
-								message = message + ' et dans ' + jsonData.data[ship]['buy_at'][loc]['system_name'] + ' à ' + jsonData.data[ship]['buy_at'][loc]['city_name'] + ' (' + jsonData.data[ship]['buy_at'][loc]['store_name'] + ') au prix de ' + jsonData.data[ship]['buy_at'][loc]['price'].toLocaleString('en-US') + ' aUEC'
+								message = message + ' et dans ' + locSystemName + ' à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
 							} else {
-								message = message + ', il est aussi disponible dans ' + jsonData.data[ship]['buy_at'][loc]['system_name'] + ' à ' + jsonData.data[ship]['buy_at'][loc]['city_name'] + ' (' + jsonData.data[ship]['buy_at'][loc]['store_name'] + ') au prix de ' + jsonData.data[ship]['buy_at'][loc]['price'].toLocaleString('en-US') + ' aUEC'
+								message = message + ', il est aussi disponible dans ' + locSystemName + ' à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
 								locID = locID + 1
 							}
 						}
@@ -144,18 +154,27 @@ function onMessageHandler (target, context, msg, self) {
 		  const commandArgs = msg.substr(posDelim,msg.length - posDelim).trim();
 		  
 		  // If the command is known, let's execute it
-		  if (commandName.toLowerCase() == '!ship') 
+		  if (commandName.toLowerCase() == '!shiprent') 
 		  {
-			  const res = getShipPrice(commandArgs)
+			  const res = getShipPrice(commandArgs,'rent')
+			  if (res != undefined) {
+				client.say(target, res);
+			  }
+		  } else if (commandName.toLowerCase() == '!shipbuy')
+		  {
+			  const res = getShipPrice(commandArgs,'buy')
 			  if (res != undefined) {
 				client.say(target, res);
 			  }
 		  }
 	  } else {
 		  const commandName = msg.trim();
-		  if (commandName == '!ship')
+		  if (commandName == '!shipbuy')
 		  {
-			client.say(target, '!ship <nom> : veuillez entrer le nom du ship');
+			client.say(target, commandName +' <nom> : veuillez entrer le nom du ship');
+		  } else if (commandName == '!shiprent')
+		  {
+			client.say(target, commandName +' <nom> : veuillez entrer le nom du ship');
 		  } else if (commandName == '!dumpapi')
 		  {
 			  fs.writeFile("jsonData.json", JSON.stringify(jsonData), (err) => {
