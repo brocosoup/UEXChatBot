@@ -1,0 +1,16 @@
+{
+  "name": "UEXChatBot",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "BrocoSoup",
+  "license": "GNU",
+  "dependencies": {
+    "node-fetch": "^2.7.0",
+    "tmi.js": "^1.8.5"
+  }
+}
