@@ -81,8 +81,8 @@ function getShipPrice(shipName) {
 	var nbShips = listShips.length;
 	var message = '';
 	if (listShips.length == 1) {
-		var nbLocs = getNbLoc(shipName);
-		console.log('Looking for \'' + listShips[0] + '\'');
+		var nbLocs = getNbLoc(listShips[0]);
+		console.log('Looking for \'' + listShips[0] + '\' and found ' + nbLocs + ' locations');
 		var message = '';
 		if (nbLocs == 0)
 		{
@@ -95,7 +95,7 @@ function getShipPrice(shipName) {
 					console.log('Found ship \'' + listShips[0] + '\'');
 					for (var loc in jsonData.data[ship]['buy_at']) 
 					{
-					
+						console.log(nbLocs + '/' + locID);
 						if (nbLocs == 1)
 						{
 							message = 'Le ' + jsonData.data[ship]['name'] + ' est disponible dans ' + jsonData.data[ship]['buy_at'][loc]['system_name'] + ' à ' + jsonData.data[ship]['buy_at'][loc]['city_name'] + ' (' + jsonData.data[ship]['buy_at'][loc]['store_name'] + ') au prix de ' + jsonData.data[ship]['buy_at'][loc]['price'].toLocaleString('en-US') + ' aUEC';
@@ -114,7 +114,9 @@ function getShipPrice(shipName) {
 								locID = locID + 1
 							}
 						}
+						console.log(message);
 					}
+					
 				}
 			}
 		}
@@ -123,8 +125,7 @@ function getShipPrice(shipName) {
 		message = 'Désolé, vous devez sélectionner un seul ship ' + listShips;
 	} else if (listShips.length >= 10){
 		message = 'Désolé, j\'ai trouvé trop de ships correspondant à ce nom (' + listShips.length + ')';
-	} else
-	{
+	} else {
 		message = 'Désolé, je n\'ai trouvé aucun ship correspondant à ce nom. Je ne saurais que vous conseiller d\'acheter un Carrack!';
 	}
 	return message
