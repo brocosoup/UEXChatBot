@@ -92,10 +92,10 @@ function getShipPrice(shipName,type) {
 				var locID = 1;
 				if (jsonData.data[ship]['name'].toLowerCase() == listShips[0].toLowerCase()) 
 				{
-					console.log('Found ship \'' + listShips[0] + '\'');
+					// console.log('Found ship \'' + listShips[0] + '\'');
 					for (var loc in jsonData.data[ship][type + '_at']) 
 					{
-						console.log(nbLocs + '/' + locID);
+						// console.log(nbLocs + '/' + locID);
 						var apiShipName = jsonData.data[ship]['name'];
 						var locSystemName = jsonData.data[ship][type + '_at'][loc]['system_name'];
 						var locCityName = jsonData.data[ship][type + '_at'][loc]['city_name'];
@@ -108,23 +108,23 @@ function getShipPrice(shipName,type) {
 						if (nbLocs == 1)
 						{
 							
-							message = 'Le ' + apiShipName + ' est disponible dans ' + locSystemName + ' à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
+							message = '(' + type + ') Le ' + apiShipName + ' est à ' + locSystemName + ' ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
 							locID = locID + 1;
 						}
 						else if (nbLocs > 1)
 						{
 							if (locID == 1) {
-								message = message = 'Le ' + apiShipName + ' est disponible dans ' + locSystemName + ' à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
+								message = message = '(' + type + ') Le ' + apiShipName + ' est à ' + locSystemName + ' ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
 								locID = locID + 1;
 							} else if (locID == nbLocs)
 							{
-								message = message + ' et dans ' + locSystemName + ' à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
+								message = message + ' et à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
 							} else {
-								message = message + ', il est aussi disponible dans ' + locSystemName + ' à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
+								message = message + ', il est aussi à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
 								locID = locID + 1
 							}
 						}
-						console.log(message);
+						// console.log(message);
 					}
 					
 				}
