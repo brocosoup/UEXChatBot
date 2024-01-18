@@ -26,7 +26,7 @@ const twitch_options = {
 
 const shipData = await fetch(ship_url,api_settings);
 var jsonData = await shipData.json();
-
+// console.log(jsonData);
 // Create a client with our options
 const client = new tmi.client(twitch_options);
  
@@ -120,11 +120,13 @@ function getShipPrice(shipName) {
 
 // Called every time a message comes in
 function onMessageHandler (target, context, msg, self) {
+  // console.log(msg);
   if (self) { return; } // Ignore messages from the bot
 
   // Remove whitespace from chat message
   const commandName = msg.substr(0,msg.indexOf(' ')).trim();
   const commandArgs = msg.substr(msg.indexOf(' '),msg.length - msg.indexOf(' ')).trim();
+  
   // If the command is known, let's execute it
   if (commandName.toLowerCase() == '!ship') {
 	  const res = getShipPrice(commandArgs)
