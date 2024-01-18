@@ -3,7 +3,7 @@ Prérequis:
 * NodeJS >= 21
 
 Installation:
-* cd UEXChatBot
+* dans le répertoire d'installation:
 * npm install esm
 * npm install tmi
 * npm install node-fetch
