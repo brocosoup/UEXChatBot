@@ -284,7 +284,7 @@ function onMessageHandler (target, context, msg, self) {
  
   if (msg.substr(0,1) == '!') // Do we have a command ?
   {
-	  console.log(target+': @' + context + ' ' +msg);
+	  console.log(target+': ' +msg);
 	  const posDelim = msg.indexOf(' ');
 	  if (posDelim != -1)
 	  {
