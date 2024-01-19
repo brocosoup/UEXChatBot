@@ -31,7 +31,6 @@ const twitch_options = {
 
 const shipData = await fetch(ship_url,api_settings);
 var jsonShipData = await shipData.json();
-
 if (jsonShipData['code'] == 200)
 {
 	fs.writeFile("jsonShipData.json", JSON.stringify(jsonShipData), (err) => {
@@ -41,10 +40,11 @@ if (jsonShipData['code'] == 200)
 		  console.log("jsonShipData written successfully\n");
 	});
 } else {
-	let rawShipdata = fs.readFileSync('jsonShipData.json');
-	let jsonShipData = JSON.parse(rawShipdata);
+	var rawShipdata = await fs.readFileSync('jsonShipData.json');
+	jsonShipData = await JSON.parse(rawShipdata);
 	console.log('Using local data for jsonShipData');
 }
+
 const commoditiesData = await fetch(commodities_url,api_settings);
 var jsonCommoditiesData = await commoditiesData.json();
 if (jsonCommoditiesData['code'] == 200)
@@ -56,11 +56,10 @@ if (jsonCommoditiesData['code'] == 200)
 		  console.log("jsonCommoditiesData written successfully\n");
 	});
 } else {
-	let rawCommoditiesdata = fs.readFileSync('jsonCommoditiesData.json');
-	let jsonCommoditiesData = JSON.parse(rawCommoditiesdata);
+	var rawCommoditiesdata = fs.readFileSync('jsonCommoditiesData.json');
+	jsonCommoditiesData = JSON.parse(rawCommoditiesdata);
 	console.log('Using local data for jsonCommoditiesData');
 }
-
 // Create a client with our options
 const client = new tmi.client(twitch_options);
  
@@ -241,6 +240,7 @@ function onMessageHandler (target, context, msg, self) {
  
   if (msg.substr(0,1) == '!') // Do we have a command ?
   {
+	  console.log(msg);
 	  const posDelim = msg.indexOf(' ');
 	  if (posDelim != -1)
 	  {
