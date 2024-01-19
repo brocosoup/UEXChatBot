@@ -260,9 +260,12 @@ function getCommoditiesPrice(commName,type)
 				}
 			}
 		}
-	} else 
-	{
+	} else if (listCommodities.length < 10 && listCommodities.length > 0) {
 		message = computeMessage(locale.commodities_list,[listCommodities]);
+	} else if (listCommodities.length >= 10) {
+		message = computeMessage(locale.commodities_too_much,[listCommodities]);
+	} else if (listCommodities.length == 0) {
+		message = computeMessage(locale.commodities_none,[listCommodities]);
 	}
 	return message;
 }
