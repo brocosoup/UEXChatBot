@@ -153,13 +153,13 @@ function getShipPrice(shipName,type) {
 		}
 		
 	} else if (listShips.length > 1 && listShips.length < 10) {
-		message = 'Désolé, vous devez sélectionner un seul ship ' + listShips;
+		// message = 'Désolé, vous devez sélectionner un seul ship ' + listShips;
 		message = computeMessage(locale.ship_only_one,[listShips]);
 	} else if (listShips.length >= 10){
-		message = 'Désolé, j\'ai trouvé trop de ships correspondant à ce nom (' + listShips.length + ')';
+		// message = 'Désolé, j\'ai trouvé trop de ships correspondant à ce nom (' + listShips.length + ')';
 		message = computeMessage(locale.ship_too_much,[listShips.length]);
 	} else {
-		message = 'Désolé, je n\'ai trouvé aucun ship correspondant à ce nom. Je ne saurais que vous conseiller d\'acheter un Carrack!';
+		// message = 'Désolé, je n\'ai trouvé aucun ship correspondant à ce nom. Je ne saurais que vous conseiller d\'acheter un Carrack!';
 		message = computeMessage(locale.ship_no_ship,[]);
 	}
 	return message

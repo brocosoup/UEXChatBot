@@ -7,7 +7,7 @@
 	"ship_available_lastloc": " et à %%3%%4 au prix de %%5", 
 	"ship_only_one": "Désolé, vous devez sélectionner un seul ship %%1",
 	"ship_too_much": "Désolé, j'ai trouvé trop de ships correspondants(%%1)",
-	"ship_only_one": "Désolé, je n'ai trouvé aucun ship correspondant. Vas t'acheter un Carrack sur le site de Chris",
+	"ship_no_ship": "Désolé, je n'ai trouvé aucun ship correspondant. Vas t'acheter un Carrack sur le site de Chris",
 	"shiprent_usage": "C'est pas comme ça ! !shiprent Carrack",
 	"shipbuy_usage": "C'est pas comme ça ! !shipbuy Carrack",
 	"shipbuy_command": "shipbuy",
