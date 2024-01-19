@@ -4,13 +4,14 @@ import fs from 'node:fs';
 
 let rawdata = fs.readFileSync('settings.json');
 let config = JSON.parse(rawdata);
-
 let rawlocale = fs.readFileSync('locale.json');
 let locale = JSON.parse(rawlocale);
 
+			  
 console.log(locale);
 // Define configuration options
-const ship_url = 'https://portal.uexcorp.space/api/ships';
+const ship_url = 'https://portal.uexcorp.space/api/ships/';
+const commodities_url = 'https://portal.uexcorp.space/api/commodities/'
 
 const api_settings = {
   method: 'GET',
@@ -30,7 +31,21 @@ const twitch_options = {
 
 const shipData = await fetch(ship_url,api_settings);
 var jsonShipData = await shipData.json();
-// console.log(jsonShipData);
+fs.writeFile("jsonShipData.json", JSON.stringify(jsonShipData), (err) => {
+  if (err)
+	  console.log(err);
+  else 
+	  console.log("jsonShipData written successfully\n");
+});
+const commoditiesData = await fetch(commodities_url,api_settings);
+var jsonCommoditiesData = await commoditiesData.json();
+fs.writeFile("jsonCommoditiesData.json", JSON.stringify(jsonShipData), (err) => {
+  if (err)
+	  console.log(err);
+  else 
+	  console.log("jsonCommoditiesData written successfully\n");
+});
+
 // Create a client with our options
 const client = new tmi.client(twitch_options);
  
@@ -202,12 +217,6 @@ function onMessageHandler (target, context, msg, self) {
 		  } else if (commandName == '!' + locale.help_command)
 		  {
 			  client.say(target, computeMessage(locale.help_message,[]));
-			  /*fs.writeFile("jsonShipData.json", JSON.stringify(jsonShipData), (err) => {
-				  if (err)
-					  console.log(err);
-				  else 
-					  console.log("File written successfully\n");
-			  });*/
 		  }
 	  }
 	  
