@@ -5,6 +5,10 @@ import fs from 'node:fs';
 let rawdata = fs.readFileSync('settings.json');
 let config = JSON.parse(rawdata);
 
+let rawlocale = fs.readFileSync('locale.json');
+let locale = JSON.parse(rawlocale);
+
+console.log(locale);
 // Define configuration options
 const ship_url = 'https://portal.uexcorp.space/api/ships';
 
@@ -37,6 +41,18 @@ client.on('connected', onConnectedHandler);
 // Connect to Twitch:
 client.connect();
 
+function computeMessage(message,table)
+{
+	var computedMessage = message;
+	var argID = 1;
+	for(var arg in table) {
+		// console.log(table[arg]);
+		computedMessage = computedMessage.replace('%%' + argID,table[arg])
+		// console.log(computedMessage);
+		argID++;
+	}
+	return computedMessage;
+}
 function getNbShip(shipName) {
 	var nbShips = 0
 	for(var ship in jsonData.data) {
@@ -82,11 +98,15 @@ function getShipPrice(shipName,type) {
 	var message = '';
 	if (listShips.length == 1) {
 		var nbLocs = getNbLoc(listShips[0],type);
-		console.log('Looking for \'' + listShips[0] + '\' and found ' + nbLocs + ' locations');
+		// console.log('Looking for \'' + listShips[0] + '\' and found ' + nbLocs + ' locations');
 		var message = '';
 		if (nbLocs == 0)
 		{
-			var message = 'Le ' + listShips[0] + ' n\'est pas disponible à l\'achat en jeu.';
+			// var message = 'Le ' + listShips[0] + ' n\'est pas disponible à l\'achat en jeu.';
+			if (type == 'buy')
+				var message = computeMessage(locale.ship_not_available_buy,[ listShips[0] ]);
+			else if (type == 'rent')
+				var message = computeMessage(locale.ship_not_available_rent,[ listShips[0] ]);
 		} else {
 			for(var ship in jsonData.data) {
 				var locID = 1;
@@ -108,19 +128,20 @@ function getShipPrice(shipName,type) {
 						if (nbLocs == 1)
 						{
 							
-							message = '(' + type + ') Le ' + apiShipName + ' est à ' + locSystemName + ' ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
+							// message = '(' + type + ') Le ' + apiShipName + ' est à ' + locSystemName + ' ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
+							message = computeMessage(locale.ship_available_oneloc,[apiShipName,locSystemName,locCityName,locStoreName,apiShipPrice,type]);
 							locID = locID + 1;
 						}
 						else if (nbLocs > 1)
 						{
 							if (locID == 1) {
-								message = message = '(' + type + ') Le ' + apiShipName + ' est à ' + locSystemName + ' ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
+								message = computeMessage(locale.ship_available_firstloc,[apiShipName,locSystemName,locCityName,locStoreName,apiShipPrice,type]);
 								locID = locID + 1;
 							} else if (locID == nbLocs)
 							{
-								message = message + ' et à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
+								message = message + computeMessage(locale.ship_available_lastloc,[apiShipName,locSystemName,locCityName,locStoreName,apiShipPrice,type]);
 							} else {
-								message = message + ', il est aussi à ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
+								message = message + computeMessage(locale.ship_available_nextloc,[apiShipName,locSystemName,locCityName,locStoreName,apiShipPrice,type]);
 								locID = locID + 1
 							}
 						}
@@ -133,10 +154,13 @@ function getShipPrice(shipName,type) {
 		
 	} else if (listShips.length > 1 && listShips.length < 10) {
 		message = 'Désolé, vous devez sélectionner un seul ship ' + listShips;
+		message = computeMessage(locale.ship_only_one,[listShips]);
 	} else if (listShips.length >= 10){
 		message = 'Désolé, j\'ai trouvé trop de ships correspondant à ce nom (' + listShips.length + ')';
+		message = computeMessage(locale.ship_too_much,[listShips.length]);
 	} else {
 		message = 'Désolé, je n\'ai trouvé aucun ship correspondant à ce nom. Je ne saurais que vous conseiller d\'acheter un Carrack!';
+		message = computeMessage(locale.ship_no_ship,[]);
 	}
 	return message
 }
@@ -154,13 +178,13 @@ function onMessageHandler (target, context, msg, self) {
 		  const commandArgs = msg.substr(posDelim,msg.length - posDelim).trim();
 		  
 		  // If the command is known, let's execute it
-		  if (commandName.toLowerCase() == '!shiprent') 
+		  if (commandName.toLowerCase() == '!' + locale.shiprent_command) 
 		  {
 			  const res = getShipPrice(commandArgs,'rent')
 			  if (res != undefined) {
 				client.say(target, res);
 			  }
-		  } else if (commandName.toLowerCase() == '!shipbuy')
+		  } else if (commandName.toLowerCase() == '!' + locale.shipbuy_command)
 		  {
 			  const res = getShipPrice(commandArgs,'buy')
 			  if (res != undefined) {
@@ -169,22 +193,21 @@ function onMessageHandler (target, context, msg, self) {
 		  }
 	  } else {
 		  const commandName = msg.trim();
-		  if (commandName == '!shipbuy')
+		  if (commandName == '!' + locale.shiprent_command)
 		  {
-			client.say(target, commandName +' <nom> : veuillez entrer le nom du ship');
-		  } else if (commandName == '!shiprent')
+			client.say(target, computeMessage(locale.shiprent_usage,[]));
+		  } else if (commandName == '!' + locale.shipbuy_command)
 		  {
-			client.say(target, commandName +' <nom> : veuillez entrer le nom du ship');
-		  } else if (commandName == '!dumpapi')
+			client.say(target, computeMessage(locale.shipbuy_usage,[]));
+		  } else if (commandName == '!' + locale.help_command)
 		  {
-			  fs.writeFile("jsonData.json", JSON.stringify(jsonData), (err) => {
-			  if (err)
-				console.log(err);
-			  else {
-				console.log("File written successfully\n");
-
-			  }
-			});
+			  client.say(target, computeMessage(locale.help_message,[]));
+			  /*fs.writeFile("jsonData.json", JSON.stringify(jsonData), (err) => {
+				  if (err)
+					  console.log(err);
+				  else 
+					  console.log("File written successfully\n");
+			  });*/
 		  }
 	  }
 	  

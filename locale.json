@@ -1,0 +1,17 @@
+{
+	"ship_not_available_buy": "Le %%1 n'est pas disponible à l'achat en jeu.",
+	"ship_not_available_rent": "Le %%1 n'est pas disponible à la location en jeu.",
+	"ship_available_oneloc": "(%%6) Le %%1 est à %%3%%4 au prix de %%5.", 
+	"ship_available_firstloc": "(%%6) Le %%1 est à %%3%%4 au prix de %%5", 
+	"ship_available_nextloc": ", il est aussi à %%3%%4 au prix de %%5", 
+	"ship_available_lastloc": " et à %%3%%4 au prix de %%5", 
+	"ship_only_one": "Désolé, vous devez sélectionner un seul ship %%1",
+	"ship_too_much": "Désolé, j'ai trouvé trop de ships correspondants(%%1)",
+	"ship_only_one": "Désolé, je n'ai trouvé aucun ship correspondant. Vas t'acheter un Carrack sur le site de Chris",
+	"shiprent_usage": "C'est pas comme ça ! !shiprent Carrack",
+	"shipbuy_usage": "C'est pas comme ça ! !shipbuy Carrack",
+	"shipbuy_command": "shipbuy",
+	"shiprent_command": "shiprent",
+	"help_command": "help",
+	"help_message": "Vous pouvez faire !shiprent Carrack and !shipbuy Carrack"
+}
