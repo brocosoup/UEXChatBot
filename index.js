@@ -11,7 +11,7 @@ let locale = JSON.parse(rawlocale);
 console.log(locale);
 // Define configuration options
 const ship_url = 'https://portal.uexcorp.space/api/ships/';
-const commodities_url = 'https://portal.uexcorp.space/api/commodities/'
+const commodities_url = 'https://portal.uexcorp.space/api/tradeports/system/ST/'
 
 const api_settings = {
   method: 'GET',
@@ -31,20 +31,35 @@ const twitch_options = {
 
 const shipData = await fetch(ship_url,api_settings);
 var jsonShipData = await shipData.json();
-fs.writeFile("jsonShipData.json", JSON.stringify(jsonShipData), (err) => {
-  if (err)
-	  console.log(err);
-  else 
-	  console.log("jsonShipData written successfully\n");
-});
+
+if (jsonShipData['code'] == 200)
+{
+	fs.writeFile("jsonShipData.json", JSON.stringify(jsonShipData), (err) => {
+	  if (err)
+		  console.log(err);
+	  else 
+		  console.log("jsonShipData written successfully\n");
+	});
+} else {
+	let rawShipdata = fs.readFileSync('jsonShipData.json');
+	let jsonShipData = JSON.parse(rawShipdata);
+	console.log('Using local data for jsonShipData');
+}
 const commoditiesData = await fetch(commodities_url,api_settings);
 var jsonCommoditiesData = await commoditiesData.json();
-fs.writeFile("jsonCommoditiesData.json", JSON.stringify(jsonShipData), (err) => {
-  if (err)
-	  console.log(err);
-  else 
-	  console.log("jsonCommoditiesData written successfully\n");
-});
+if (jsonCommoditiesData['code'] == 200)
+{
+	fs.writeFile("jsonCommoditiesData.json", JSON.stringify(jsonCommoditiesData), (err) => {
+	  if (err)
+		  console.log(err);
+	  else 
+		  console.log("jsonCommoditiesData written successfully\n");
+	});
+} else {
+	let rawCommoditiesdata = fs.readFileSync('jsonCommoditiesData.json');
+	let jsonCommoditiesData = JSON.parse(rawCommoditiesdata);
+	console.log('Using local data for jsonCommoditiesData');
+}
 
 // Create a client with our options
 const client = new tmi.client(twitch_options);
@@ -180,6 +195,46 @@ function getShipPrice(shipName,type) {
 	return message
 }
 
+function getCommoditiesPrice(commName,type) 
+{
+	var message = ''
+	for(var tradeport in jsonCommoditiesData.data) {
+		for (var commodity in jsonCommoditiesData.data[tradeport]['prices'])
+		{
+			if (jsonCommoditiesData.data[tradeport]['prices'][commodity]['name'] != null) 
+			{
+				if (jsonCommoditiesData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == commName.toLowerCase() && jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_buy'] > 0)
+				{
+					if (message == '')
+					{
+						message = computeMessage(locale.commodities_found, [jsonCommoditiesData.data[tradeport]['prices'][commodity]['name']])
+					}
+					
+					var loc = jsonCommoditiesData.data[tradeport]['planet']
+					if (jsonCommoditiesData.data[tradeport]['satellite'] != null && jsonCommoditiesData.data[tradeport]['satellite'] != '')
+					{
+						loc = jsonCommoditiesData.data[tradeport]['satellite']
+					}
+					if (jsonCommoditiesData.data[tradeport]['city'] != null && jsonCommoditiesData.data[tradeport]['city'] != '')
+					{
+						loc = jsonCommoditiesData.data[tradeport]['city']
+					}
+					// message = message + ' ' + jsonCommoditiesData.data[tradeport]['name_short'] + ' (' + loc + "):(buy) " + jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US') + ' aUEC';
+					if (type == 'buy')
+					{
+						message = message + ' ' + computeMessage(locale.commodities_buy,[jsonCommoditiesData.data[tradeport]['name_short'],loc,jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US')])
+					} else if (type == 'sell')
+					{
+						message = message + ' ' + computeMessage(locale.commodities_buy,[jsonCommoditiesData.data[tradeport]['name_short'],loc,jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_sell'].toLocaleString('en-US')])
+					}
+				}
+			}
+		}
+	}
+	return message;
+}
+
+
 // Called every time a message comes in
 function onMessageHandler (target, context, msg, self) {
   if (self) { return; } // Ignore messages from the bot
@@ -205,7 +260,20 @@ function onMessageHandler (target, context, msg, self) {
 			  if (res != undefined) {
 				client.say(target, res);
 			  }
+		  } else if (commandName.toLowerCase() == '!' + locale.infobuy_command)
+		  {
+			  const res = getCommoditiesPrice(commandArgs,'buy')
+			  if (res != undefined) {
+				client.say(target, res);
+			  }
+		  } else if (commandName.toLowerCase() == '!' + locale.infosell_command)
+		  {
+			  const res = getCommoditiesPrice(commandArgs,'sell')
+			  if (res != undefined) {
+				client.say(target, res);
+			  }
 		  }
+		  
 	  } else {
 		  const commandName = msg.trim();
 		  if (commandName == '!' + locale.shiprent_command)

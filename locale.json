@@ -10,8 +10,13 @@
 	"ship_no_ship": "Désolé, je n'ai trouvé aucun ship correspondant. Vas t'acheter un Carrack sur le site de Chris",
 	"shiprent_usage": "C'est pas comme ça ! !shiprent Carrack",
 	"shipbuy_usage": "C'est pas comme ça ! !shipbuy Carrack",
+	"help_message": "Salut PixelBob, tu peux faire les commandes suivantes ModLove !shiprent Carrack et !shipbuy Carrack. ModLove ",
+	"commodities_found": "J'ai trouvé ceci pour %%1:",
+	"commodities_buy": " %%1(%%2) achète pour %%3 aUEC",
+	"commodities_sell": " %%1(%%2) vends pour %%3 aUEC",
 	"shipbuy_command": "shipbuy",
 	"shiprent_command": "shiprent",
-	"help_command": "help",
-	"help_message": "Salut PixelBob, tu peux faire les commandes suivantes ModLove !shiprent Carrack et !shipbuy Carrack. ModLove "
+	"infobuy_command": "infobuy",
+	"infosell_command": "infosell",
+	"help_command": "help"
 }
