@@ -29,8 +29,8 @@ const twitch_options = {
 };
 
 const shipData = await fetch(ship_url,api_settings);
-var jsonData = await shipData.json();
-// console.log(jsonData);
+var jsonShipData = await shipData.json();
+// console.log(jsonShipData);
 // Create a client with our options
 const client = new tmi.client(twitch_options);
  
@@ -55,10 +55,10 @@ function computeMessage(message,table)
 }
 function getNbShip(shipName) {
 	var nbShips = 0
-	for(var ship in jsonData.data) {
-			if (jsonData.data[ship]['name'].toLowerCase() == shipName.toLowerCase()) {
+	for(var ship in jsonShipData.data) {
+			if (jsonShipData.data[ship]['name'].toLowerCase() == shipName.toLowerCase()) {
 				return 1;
-			} else if (jsonData.data[ship]['name'].toLowerCase().includes(shipName.toLowerCase())) {
+			} else if (jsonShipData.data[ship]['name'].toLowerCase().includes(shipName.toLowerCase())) {
 				nbShips = nbShips + 1
 			}
 	}
@@ -67,13 +67,13 @@ function getNbShip(shipName) {
 
 function getShipList(shipName) {
 	var shipsList = []
-	for(var ship in jsonData.data) {
-		if (jsonData.data[ship]['name'].toLowerCase() == shipName.toLowerCase()) {
-			shipsList.push(jsonData.data[ship]['name']);
+	for(var ship in jsonShipData.data) {
+		if (jsonShipData.data[ship]['name'].toLowerCase() == shipName.toLowerCase()) {
+			shipsList.push(jsonShipData.data[ship]['name']);
 			return shipsList; //we have a match, we can exit right now!
-		} else if (jsonData.data[ship]['name'].toLowerCase().includes(shipName.toLowerCase()))
+		} else if (jsonShipData.data[ship]['name'].toLowerCase().includes(shipName.toLowerCase()))
 		{
-			shipsList.push(jsonData.data[ship]['name']);
+			shipsList.push(jsonShipData.data[ship]['name']);
 		}
 	}	
 	return shipsList;
@@ -81,9 +81,9 @@ function getShipList(shipName) {
 
 function getNbLoc(shipName,type) {
 	var nbLocs = 0
-	for(var ship in jsonData.data) {
-		for (var loc in jsonData.data[ship][type + '_at']) {
-			if (jsonData.data[ship]['name'].toLowerCase() == shipName.toLowerCase()) {
+	for(var ship in jsonShipData.data) {
+		for (var loc in jsonShipData.data[ship][type + '_at']) {
+			if (jsonShipData.data[ship]['name'].toLowerCase() == shipName.toLowerCase()) {
 				nbLocs = nbLocs + 1
 			}
 		}
@@ -108,23 +108,23 @@ function getShipPrice(shipName,type) {
 			else if (type == 'rent')
 				var message = computeMessage(locale.ship_not_available_rent,[ listShips[0] ]);
 		} else {
-			for(var ship in jsonData.data) {
+			for(var ship in jsonShipData.data) {
 				var locID = 1;
-				if (jsonData.data[ship]['name'].toLowerCase() == listShips[0].toLowerCase()) 
+				if (jsonShipData.data[ship]['name'].toLowerCase() == listShips[0].toLowerCase()) 
 				{
 					// console.log('Found ship \'' + listShips[0] + '\'');
-					for (var loc in jsonData.data[ship][type + '_at']) 
+					for (var loc in jsonShipData.data[ship][type + '_at']) 
 					{
 						// console.log(nbLocs + '/' + locID);
-						var apiShipName = jsonData.data[ship]['name'];
-						var locSystemName = jsonData.data[ship][type + '_at'][loc]['system_name'];
-						var locCityName = jsonData.data[ship][type + '_at'][loc]['city_name'];
+						var apiShipName = jsonShipData.data[ship]['name'];
+						var locSystemName = jsonShipData.data[ship][type + '_at'][loc]['system_name'];
+						var locCityName = jsonShipData.data[ship][type + '_at'][loc]['city_name'];
 						if (locCityName == undefined)
-							locCityName = jsonData.data[ship][type + '_at'][loc]['tradeport'];								
-						var locStoreName = '(' + jsonData.data[ship][type + '_at'][loc]['store_name'] + ')';
+							locCityName = jsonShipData.data[ship][type + '_at'][loc]['tradeport'];								
+						var locStoreName = '(' + jsonShipData.data[ship][type + '_at'][loc]['store_name'] + ')';
 						if (locStoreName == '(null)')
 							locStoreName = '';	
-						var apiShipPrice = jsonData.data[ship][type + '_at'][loc]['price'].toLocaleString('en-US') + ' aUEC'
+						var apiShipPrice = jsonShipData.data[ship][type + '_at'][loc]['price'].toLocaleString('en-US') + ' aUEC'
 						if (nbLocs == 1)
 						{
 							
@@ -202,7 +202,7 @@ function onMessageHandler (target, context, msg, self) {
 		  } else if (commandName == '!' + locale.help_command)
 		  {
 			  client.say(target, computeMessage(locale.help_message,[]));
-			  /*fs.writeFile("jsonData.json", JSON.stringify(jsonData), (err) => {
+			  /*fs.writeFile("jsonShipData.json", JSON.stringify(jsonShipData), (err) => {
 				  if (err)
 					  console.log(err);
 				  else 
