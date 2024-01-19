@@ -355,14 +355,7 @@ function sendMe(target, message)
 	{
 		// console.log(msgArray[msg]);
 		client.say(target,msgArray[msg])
-		sleep(5000);
 	}
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
 }
 
 // Called every time the bot connects to Twitch chat
