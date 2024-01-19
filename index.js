@@ -72,8 +72,8 @@ if (jsonTradeportsData['code'] == 200)
 		  console.log("jsonTradeportsData written successfully\n");
 	});
 } else {
-	var rawCommoditiesdata = fs.readFileSync('jsonTradeportsData.json');
-	jsonTradeportsData = JSON.parse(rawCommoditiesdata);
+	var rawTradeportsdata = fs.readFileSync('jsonTradeportsData.json');
+	jsonTradeportsData = JSON.parse(rawTradeportsdata);
 	console.log('Using local data for jsonTradeportsData');
 }
 // Create a client with our options
@@ -212,38 +212,57 @@ function getShipPrice(shipName,type) {
 
 function getListCommodities(commName)
 {
-	
+	var listCommodities = []
+	// console.log(jsonCommoditiesData.data);
+	for (var commodID in jsonCommoditiesData.data)
+	{
+		if (jsonCommoditiesData.data[commodID]['name'].toLowerCase() == commName.toLowerCase())
+		{
+			listCommodities.push(jsonCommoditiesData.data[commodID]['name']);
+			return listCommodities;
+		} else if (jsonCommoditiesData.data[commodID]['name'].toLowerCase().includes(commName.toLowerCase()))
+		{
+			listCommodities.push(jsonCommoditiesData.data[commodID]['name']);
+		}
+	}
+	return listCommodities;
 }
-
 function getCommoditiesPrice(commName,type) 
 {
+	const listCommodities = getListCommodities(commName)
 	var message = ''
-	for(var tradeport in jsonTradeportsData.data) {
-		for (var commodity in jsonTradeportsData.data[tradeport]['prices'])
-		{
-			if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'] != null) 
+	if (listCommodities.length == 1)
+	{		
+		for(var tradeport in jsonTradeportsData.data) {
+			for (var commodity in jsonTradeportsData.data[tradeport]['prices'])
 			{
-				if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == commName.toLowerCase() && jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] > 0)
+				if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'] != null) 
 				{
-					if (message == '')
+					if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == listCommodities[0].toLowerCase() && jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] > 0)
 					{
-						message = computeMessage(locale.commodities_found, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name']])
+						if (message == '')
+						{
+							message = computeMessage(locale.commodities_found, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name']])
+						}
+						
+						var loc = jsonTradeportsData.data[tradeport]['planet']
+						if (jsonTradeportsData.data[tradeport]['satellite'] != null && jsonTradeportsData.data[tradeport]['satellite'] != '')
+						{
+							loc = jsonTradeportsData.data[tradeport]['satellite']
+						}
+						if (jsonTradeportsData.data[tradeport]['city'] != null && jsonTradeportsData.data[tradeport]['city'] != '')
+						{
+							loc = jsonTradeportsData.data[tradeport]['city']
+						}
+						// message = message + ' ' + jsonTradeportsData.data[tradeport]['name_short'] + ' (' + loc + "):(buy) " + jsonTradeportsData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US') + ' aUEC';
+						message = message + ' ' + computeMessage(locale.commodities_buy,[jsonTradeportsData.data[tradeport]['name_short'],loc,jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type].toLocaleString('en-US')])
 					}
-					
-					var loc = jsonTradeportsData.data[tradeport]['planet']
-					if (jsonTradeportsData.data[tradeport]['satellite'] != null && jsonTradeportsData.data[tradeport]['satellite'] != '')
-					{
-						loc = jsonTradeportsData.data[tradeport]['satellite']
-					}
-					if (jsonTradeportsData.data[tradeport]['city'] != null && jsonTradeportsData.data[tradeport]['city'] != '')
-					{
-						loc = jsonTradeportsData.data[tradeport]['city']
-					}
-					// message = message + ' ' + jsonTradeportsData.data[tradeport]['name_short'] + ' (' + loc + "):(buy) " + jsonTradeportsData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US') + ' aUEC';
-					message = message + ' ' + computeMessage(locale.commodities_buy,[jsonTradeportsData.data[tradeport]['name_short'],loc,jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type].toLocaleString('en-US')])
 				}
 			}
 		}
+	} else 
+	{
+		message = computeMessage(locale.commodities_list,[listCommodities]);
 	}
 	return message;
 }
