@@ -11,7 +11,8 @@ let locale = JSON.parse(rawlocale);
 console.log(locale);
 // Define configuration options
 const ship_url = 'https://portal.uexcorp.space/api/ships/';
-const commodities_url = 'https://portal.uexcorp.space/api/tradeports/system/ST/'
+const tradeports_url = 'https://portal.uexcorp.space/api/tradeports/system/ST/'
+const commodities_url = 'https://portal.uexcorp.space/api/commodities/'
 
 const api_settings = {
   method: 'GET',
@@ -59,6 +60,21 @@ if (jsonCommoditiesData['code'] == 200)
 	var rawCommoditiesdata = fs.readFileSync('jsonCommoditiesData.json');
 	jsonCommoditiesData = JSON.parse(rawCommoditiesdata);
 	console.log('Using local data for jsonCommoditiesData');
+}
+const tradeportsData = await fetch(tradeports_url,api_settings);
+var jsonTradeportsData = await tradeportsData.json();
+if (jsonTradeportsData['code'] == 200)
+{
+	fs.writeFile("jsonTradeportsData.json", JSON.stringify(jsonTradeportsData), (err) => {
+	  if (err)
+		  console.log(err);
+	  else 
+		  console.log("jsonTradeportsData written successfully\n");
+	});
+} else {
+	var rawCommoditiesdata = fs.readFileSync('jsonTradeportsData.json');
+	jsonTradeportsData = JSON.parse(rawCommoditiesdata);
+	console.log('Using local data for jsonTradeportsData');
 }
 // Create a client with our options
 const client = new tmi.client(twitch_options);
@@ -194,32 +210,37 @@ function getShipPrice(shipName,type) {
 	return message
 }
 
+function getListCommodities(commName)
+{
+	
+}
+
 function getCommoditiesPrice(commName,type) 
 {
 	var message = ''
-	for(var tradeport in jsonCommoditiesData.data) {
-		for (var commodity in jsonCommoditiesData.data[tradeport]['prices'])
+	for(var tradeport in jsonTradeportsData.data) {
+		for (var commodity in jsonTradeportsData.data[tradeport]['prices'])
 		{
-			if (jsonCommoditiesData.data[tradeport]['prices'][commodity]['name'] != null) 
+			if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'] != null) 
 			{
-				if (jsonCommoditiesData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == commName.toLowerCase() && jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_' + type] > 0)
+				if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == commName.toLowerCase() && jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] > 0)
 				{
 					if (message == '')
 					{
-						message = computeMessage(locale.commodities_found, [jsonCommoditiesData.data[tradeport]['prices'][commodity]['name']])
+						message = computeMessage(locale.commodities_found, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name']])
 					}
 					
-					var loc = jsonCommoditiesData.data[tradeport]['planet']
-					if (jsonCommoditiesData.data[tradeport]['satellite'] != null && jsonCommoditiesData.data[tradeport]['satellite'] != '')
+					var loc = jsonTradeportsData.data[tradeport]['planet']
+					if (jsonTradeportsData.data[tradeport]['satellite'] != null && jsonTradeportsData.data[tradeport]['satellite'] != '')
 					{
-						loc = jsonCommoditiesData.data[tradeport]['satellite']
+						loc = jsonTradeportsData.data[tradeport]['satellite']
 					}
-					if (jsonCommoditiesData.data[tradeport]['city'] != null && jsonCommoditiesData.data[tradeport]['city'] != '')
+					if (jsonTradeportsData.data[tradeport]['city'] != null && jsonTradeportsData.data[tradeport]['city'] != '')
 					{
-						loc = jsonCommoditiesData.data[tradeport]['city']
+						loc = jsonTradeportsData.data[tradeport]['city']
 					}
-					// message = message + ' ' + jsonCommoditiesData.data[tradeport]['name_short'] + ' (' + loc + "):(buy) " + jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US') + ' aUEC';
-					message = message + ' ' + computeMessage(locale.commodities_buy,[jsonCommoditiesData.data[tradeport]['name_short'],loc,jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_' + type].toLocaleString('en-US')])
+					// message = message + ' ' + jsonTradeportsData.data[tradeport]['name_short'] + ' (' + loc + "):(buy) " + jsonTradeportsData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US') + ' aUEC';
+					message = message + ' ' + computeMessage(locale.commodities_buy,[jsonTradeportsData.data[tradeport]['name_short'],loc,jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type].toLocaleString('en-US')])
 				}
 			}
 		}
