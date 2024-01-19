@@ -255,7 +255,10 @@ function getCommoditiesPrice(commName,type)
 							loc = jsonTradeportsData.data[tradeport]['city']
 						}
 						// message = message + ' ' + jsonTradeportsData.data[tradeport]['name_short'] + ' (' + loc + "):(buy) " + jsonTradeportsData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US') + ' aUEC';
-						message = message + ' ' + computeMessage(locale.commodities_buy,[jsonTradeportsData.data[tradeport]['name_short'],loc,jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type].toLocaleString('en-US')])
+						if (type == buy)
+							message = message + ' ' + computeMessage(locale.commodities_buy,[jsonTradeportsData.data[tradeport]['name_short'],loc,jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type].toLocaleString('en-US')])
+						else if (type == sell)
+							message = message + ' ' + computeMessage(locale.commodities_sell,[jsonTradeportsData.data[tradeport]['name_short'],loc,jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type].toLocaleString('en-US')])
 					}
 				}
 			}
