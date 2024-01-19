@@ -14,6 +14,7 @@
 	"commodities_found": "KomodoHype J'ai trouvé ceci pour %%1 KomodoHype ",
 	"commodities_buy": " %%1(%%2) achète pour %%3 aUEC HolidayPresent",
 	"commodities_sell": " %%1(%%2) vends pour %%3 aUEC HolidayPresent",
+	"commodities_list": "Vous devez être plus précis : %%1 PixelBob",
 	"shipbuy_command": "shipbuy",
 	"shiprent_command": "shiprent",
 	"infobuy_command": "infobuy",
