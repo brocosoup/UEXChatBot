@@ -202,7 +202,7 @@ function getCommoditiesPrice(commName,type)
 		{
 			if (jsonCommoditiesData.data[tradeport]['prices'][commodity]['name'] != null) 
 			{
-				if (jsonCommoditiesData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == commName.toLowerCase() && jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_buy'] > 0)
+				if (jsonCommoditiesData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == commName.toLowerCase() && jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_' + type] > 0)
 				{
 					if (message == '')
 					{
@@ -219,14 +219,7 @@ function getCommoditiesPrice(commName,type)
 						loc = jsonCommoditiesData.data[tradeport]['city']
 					}
 					// message = message + ' ' + jsonCommoditiesData.data[tradeport]['name_short'] + ' (' + loc + "):(buy) " + jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US') + ' aUEC';
-					if (type == 'buy')
-					{
-						console.log(jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US'));
-						message = message + ' ' + computeMessage(locale.commodities_buy,[jsonCommoditiesData.data[tradeport]['name_short'],loc,jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US')])
-					} else if (type == 'sell')
-					{
-						message = message + ' ' + computeMessage(locale.commodities_buy,[jsonCommoditiesData.data[tradeport]['name_short'],loc,jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_sell'].toLocaleString('en-US')])
-					}
+					message = message + ' ' + computeMessage(locale.commodities_buy,[jsonCommoditiesData.data[tradeport]['name_short'],loc,jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_' + type].toLocaleString('en-US')])
 				}
 			}
 		}
