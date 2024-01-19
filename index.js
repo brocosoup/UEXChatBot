@@ -272,7 +272,7 @@ function getCommoditiesPrice(commName,type)
 	}
 	if (message == '')
 	{
-		message.computeMessage(locale.commodities_no_loc,[listCommodities]);
+		message = computeMessage(locale.commodities_no_loc,[listCommodities]);
 	}
 	return message;
 }
