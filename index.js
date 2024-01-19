@@ -355,6 +355,7 @@ function sendMe(target, message)
 	{
 		// console.log(msgArray[msg]);
 		client.say(target,msgArray[msg])
+		await sleep(1000);
 	}
 }
 
