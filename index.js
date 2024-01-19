@@ -296,25 +296,25 @@ function onMessageHandler (target, context, msg, self) {
 		  {
 			  const res = getShipPrice(commandArgs,'rent')
 			  if (res != undefined) {
-				client.say(target, res);
+				sendMe(target, res);
 			  }
 		  } else if (commandName.toLowerCase() == '!' + locale.shipbuy_command)
 		  {
 			  const res = getShipPrice(commandArgs,'buy')
 			  if (res != undefined) {
-				client.say(target, res);
+				sendMe(target, res);
 			  }
 		  } else if (commandName.toLowerCase() == '!' + locale.infobuy_command)
 		  {
 			  const res = getCommoditiesPrice(commandArgs,'buy')
 			  if (res != undefined) {
-				client.say(target, res);
+				sendMe(target, res);
 			  }
 		  } else if (commandName.toLowerCase() == '!' + locale.infosell_command)
 		  {
 			  const res = getCommoditiesPrice(commandArgs,'sell')
 			  if (res != undefined) {
-				client.say(target, res);
+				sendMe(target, res);
 			  }
 		  }
 		  
@@ -322,18 +322,40 @@ function onMessageHandler (target, context, msg, self) {
 		  const commandName = msg.trim();
 		  if (commandName == '!' + locale.shiprent_command)
 		  {
-			client.say(target, computeMessage(locale.shiprent_usage,[]));
+			sendMe(target, computeMessage(locale.shiprent_usage,[]));
 		  } else if (commandName == '!' + locale.shipbuy_command)
 		  {
-			client.say(target, computeMessage(locale.shipbuy_usage,[]));
+			sendMe(target, computeMessage(locale.shipbuy_usage,[]));
 		  } else if (commandName == '!' + locale.help_command)
 		  {
-			  client.say(target, computeMessage(locale.help_message,[]));
+			  sendMe(target, computeMessage(locale.help_message,[]));
 		  }
 	  }
 	  
 
   }
+}
+
+function sendMe(target, message)
+{
+	const posLimit = 400;
+	var msgArray = [];
+	if (message.length < posLimit)
+	{
+		msgArray.push(message)
+	} else {
+		while (message.length >= posLimit)
+		{
+			var pos = message.indexOf('aUEC ',posLimit) + 5;
+			msgArray.push(message.substr(0, pos));
+			message = message.substr(pos, message.length);
+		}
+	}
+	for (var msg in msgArray)
+	{
+		// console.log(msgArray[msg]);
+		client.say(target,msgArray[msg])
+	}
 }
 
 // Called every time the bot connects to Twitch chat
