@@ -221,6 +221,7 @@ function getCommoditiesPrice(commName,type)
 					// message = message + ' ' + jsonCommoditiesData.data[tradeport]['name_short'] + ' (' + loc + "):(buy) " + jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US') + ' aUEC';
 					if (type == 'buy')
 					{
+						console.log(jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US'));
 						message = message + ' ' + computeMessage(locale.commodities_buy,[jsonCommoditiesData.data[tradeport]['name_short'],loc,jsonCommoditiesData.data[tradeport]['prices'][commodity]['price_buy'].toLocaleString('en-US')])
 					} else if (type == 'sell')
 					{
