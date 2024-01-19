@@ -269,6 +269,9 @@ function getCommoditiesPrice(commName,type)
 		message = computeMessage(locale.commodities_too_much,[listCommodities]);
 	} else if (listCommodities.length == 0) {
 		message = computeMessage(locale.commodities_none,[listCommodities]);
+	} else if (message == '')
+	{
+		message.computeMessage(locale.commodities_no_loc,[listCommodities]);
 	}
 	return message;
 }

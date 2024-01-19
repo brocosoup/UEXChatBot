@@ -15,6 +15,7 @@
 	"commodities_buy": " %%1(%%2) vends pour %%3 aUEC HolidayPresent",
 	"commodities_sell": " %%1(%%2) achète pour %%3 aUEC HolidayPresent",
 	"commodities_list": "Vous devez être plus précis : %%1 PixelBob",
+	"commodities_no_loc": "Aucun emplacement de trade trouvé pour %%1 (%%2) PixelBob ",
 	"commodities_too_much": "J'ai trouvé trop de réponses correspondantes HolidayPresent",
 	"commodities_none": "Kappa Je n'ai trouvé aucune réponse correspondantes PixelBob HolidayPresent Kappa",
 	"shipbuy_command": "shipbuy",
