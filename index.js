@@ -1,6 +1,7 @@
 import tmi from 'tmi.js';
 import fetch from 'node-fetch';
 import fs from 'node:fs';
+import server from './server.cjs';
 
 let rawdata = fs.readFileSync('settings.json');
 let config = JSON.parse(rawdata);
@@ -29,6 +30,11 @@ const twitch_options = {
   },
   channels: config.channels
 };
+
+if (config.api_key == '')
+{
+	console.log('You UEX api_key is empty in settings.json, I will not update the data!');
+}
 
 const shipData = await fetch(ship_url,api_settings);
 var jsonShipData = await shipData.json();
@@ -76,6 +82,31 @@ if (jsonTradeportsData['code'] == 200)
 	jsonTradeportsData = JSON.parse(rawTradeportsdata);
 	console.log('Using local data for jsonTradeportsData');
 }
+
+
+var profile = []
+if (twitch_options.identity.password == '' || twitch_options.identity.password == undefined)
+{
+	server.runAuthServ();
+	console.log('Waiting for auth: go to http://localhost:3000');
+	while (profile == '')
+	{
+		profile = server.getProfile()
+		await new Promise(r => setTimeout(r, 2000));
+	}
+	twitch_options.identity.username = profile.data[0].display_name.toLowerCase();
+	twitch_options.identity.password = 'oauth:' + profile.accessToken
+	twitch_options.channels = [ profile.data[0].display_name.toLowerCase() ];
+	twitch_options.api_key = ''
+	fs.writeFile("settings.json", JSON.stringify(twitch_options), (err) => {
+	  if (err)
+		  console.log(err);
+	  else 
+		  console.log("settings updated successfully\n");
+	});
+	server.kill();
+}
+// Connect to Twitch:
 // Create a client with our options
 const client = new tmi.client(twitch_options);
  
@@ -83,7 +114,6 @@ const client = new tmi.client(twitch_options);
 client.on('message', onMessageHandler);
 client.on('connected', onConnectedHandler);
 
-// Connect to Twitch:
 client.connect();
 
 function computeMessage(message,table)
@@ -135,7 +165,6 @@ function getNbLoc(shipName,type) {
 	}
 	return nbLocs;
 }
-
 
 function getShipPrice(shipName,type) {
 	var listShips = getShipList(shipName);
@@ -213,7 +242,6 @@ function getShipPrice(shipName,type) {
 function getListCommodities(commName)
 {
 	var listCommodities = []
-	// console.log(jsonCommoditiesData.data);
 	for (var commodID in jsonCommoditiesData.data)
 	{
 		if (jsonCommoditiesData.data[commodID]['name'].toLowerCase() == commName.toLowerCase())
