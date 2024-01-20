@@ -21,12 +21,20 @@ const api_settings = {
   },
 };
 
-const twitch_options = {
+var twitch_options = {
+  server: {
+	'client': "",
+	'secret': "",
+	'session': "",
+	'callback': ""
+  },
   identity: {
     'username': config.identity.username,
     'password': config.identity.password
   },
-  channels: config.channels
+  channels: config.channels,
+  api_key: ""
+  
 };
 
 if (config.api_key == '')
@@ -96,6 +104,8 @@ if (config.identity.password == undefined || config.identity.password == '')
 	twitch_options.identity.password = 'oauth:' + profile.accessToken
 	twitch_options.channels = config.channels;
 	twitch_options.api_key = config.api_key
+	console.log(config);
+	console.log(config.server.client);
 	twitch_options.server.client = config.server.client
 	twitch_options.server.secret = config.server.secret
 	twitch_options.server.session = config.server.session

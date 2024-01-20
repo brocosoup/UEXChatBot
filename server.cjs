@@ -26,7 +26,7 @@ let config = JSON.parse(rawdata);
 const TWITCH_CLIENT_ID = config.server.client;
 const TWITCH_SECRET    = config.server.secret;
 const SESSION_SECRET   = config.server.session;
-const CALLBACK_URL     = config.server.callback; // http://localhost:3000/auth/twitch/callback  // You can run locally with - http://localhost:3000/auth/twitch/callback
+const CALLBACK_URL     = config.server.callback; // You can run locally with - http://localhost:3000/auth/twitch/callback
 
 var loggedinUser = '';
 // Initialize Express and middlewares
