@@ -109,7 +109,7 @@ if (config.identity.password == undefined || config.identity.password == '')
 	twitch_options.server.client = config.server.client
 	twitch_options.server.secret = config.server.secret
 	twitch_options.server.session = config.server.session
-	twitch_options.server.session = config.server.callback
+	twitch_options.server.callback = config.server.callback
 	fs.writeFile("settings.json", JSON.stringify(twitch_options), (err) => {
 	  if (err)
 		  console.log(err);
@@ -320,7 +320,6 @@ function getCommoditiesPrice(commName,type)
 		else if (type == 'sell')
 			ListOfCommodities.sort(compareComByPriceAsc);
 		var limit = 0;
-		console.log(ListOfCommodities);
 		for (var commodity in ListOfCommodities)
 		{
 			// ListOfCommodities[commodity]
