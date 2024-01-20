@@ -1,0 +1,17 @@
+{
+	"server": {
+		"client": "rthberergergergrgetrgegregrerr",
+		"secret": "ergergerrezgergfdgdfhgrtutyjty",
+		"session": "erggrtetyhtrhjrthrtytyu159489",
+		"callback": "http://localhost:3000/auth/twitch/callback"
+	},
+	"identity": {
+		"username": "channel_user",
+		"password": "oauth:gik9grzegzefzergerx6wpfjp74al"
+	},
+	"channels": [
+		"channel_user",
+		"other_chan"
+	],
+	"api_key": "7a1a29f8er819herrehreg9a3e73729"
+}
