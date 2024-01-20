@@ -26,9 +26,9 @@ npm install node-fetch
 npm install esm
 ```
 - Edit settings.json
-* Récupérer une clé API sur https://uexcorp.space/api.html
-* Connecter le bot à Twitch sur https://twitchapps.com/tmi/
-* On met tout dans le settings.json (qu'il faut créér)
+	* Récupérer une clé API sur https://uexcorp.space/api.html
+	* Connecter le bot à Twitch sur https://twitchapps.com/tmi/
+	* On met tout dans le settings.json (qu'il faut créér)
 ```json
 {
 	"username": "",
