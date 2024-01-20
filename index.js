@@ -23,17 +23,17 @@ const api_settings = {
 
 var twitch_options = {
 	server: {
-		'client': "",
-		'secret': "",
-		'session': "",
-		'callback': ""
+		'client': config.server.client,
+		'secret': config.server.secret,
+		'session': config.server.session,
+		'callback': config.server.callback
 	},
 	identity: {
 		'username': config.identity.username,
 		'password': config.identity.password
 	},
 	channels: config.channels,
-	api_key: ""
+	api_key: config.api_key
 
 };
 
