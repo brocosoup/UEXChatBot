@@ -25,9 +25,15 @@ npm install tmi
 npm install node-fetch
 npm install esm
 ```
-- Edit settings.json
-	* Get an API key from https://uexcorp.space/api.html
-	* Connect the bot account to https://twitchapps.com/tmi/
+- Launch it!
+```
+npm start
+```
+  Navigate to `http://localhost:3000`
+  Login to twitch
+  
+- Check settings.json
+	* Get an API key from https://uexcorp.space/api.html (optional if you have json files)
  	* username is the bot twitch username (e.g. mybot)
 	* password if your oauth key from twitchapps (e.g. oauth:ks478f8fveruijnze545645)
  	* api_key is the UEX api key (e.g. ezf4897bg156trg4899bv156r189189)
@@ -40,9 +46,3 @@ npm install esm
 	"channels": [ "mychannel" ]
 }
 ```
-
-- Launch it!
-```
-npm start
-```
-  Navigate to `http://localhost:3000`
