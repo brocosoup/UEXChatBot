@@ -8,9 +8,6 @@ let config = await JSON.parse(rawdata);
 let rawlocale = await fs.readFileSync('locale.json');
 let locale = await JSON.parse(rawlocale);
 
-			  
-console.log(locale);
-console.log(config);
 // Define configuration options
 const ship_url = 'https://portal.uexcorp.space/api/ships/';
 const tradeports_url = 'https://portal.uexcorp.space/api/tradeports/system/ST/'
@@ -86,7 +83,6 @@ if (jsonTradeportsData['code'] == 200)
 
 
 var profile = []
-console.log(config);
 if (config.identity.password == undefined || config.identity.password == '')
 {
 	server.runAuthServ();
@@ -98,8 +94,12 @@ if (config.identity.password == undefined || config.identity.password == '')
 	}
 	twitch_options.identity.username = profile.data[0].display_name.toLowerCase();
 	twitch_options.identity.password = 'oauth:' + profile.accessToken
-	twitch_options.channels = [ profile.data[0].display_name.toLowerCase() ];
-	twitch_options.api_key = ''
+	twitch_options.channels = config.channels;
+	twitch_options.api_key = config.api_key
+	twitch_options.server.client = config.server.client
+	twitch_options.server.secret = config.server.secret
+	twitch_options.server.session = config.server.session
+	twitch_options.server.session = config.server.callback
 	fs.writeFile("settings.json", JSON.stringify(twitch_options), (err) => {
 	  if (err)
 		  console.log(err);
