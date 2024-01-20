@@ -19,9 +19,9 @@ var handlebars     = require('handlebars');
 var fs			   = require('fs');
 
 // Define our constants, you will change these with your own
-const TWITCH_CLIENT_ID = 'sqx4iidghyopdr9emcootva3abfy0u';
-const TWITCH_SECRET    = '4a5t1et26u2of0iw8lak9q1uwrzbcb';
-const SESSION_SECRET   = 'yopiidgotva3hyolak9r9e26u2of0i';
+const TWITCH_CLIENT_ID = '';
+const TWITCH_SECRET    = '';
+const SESSION_SECRET   = '';
 const CALLBACK_URL     = 'http://localhost:3000/auth/twitch/callback';  // You can run locally with - http://localhost:3000/auth/twitch/callback
 
 var loggedinUser = '';
