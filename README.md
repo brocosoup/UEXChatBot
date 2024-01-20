@@ -31,7 +31,7 @@ npm install esm
  	* username is the bot twitch username (e.g. mybot)
 	* password if your oauth key from twitchapps (e.g. oauth:ks478f8fveruijnze545645)
  	* api_key is the UEX api key (e.g. ezf4897bg156trg4899bv156r189189)
-  	* channels is a table containing one (e.g. "channels": [ "mychannel" ]) or a list (e.g. "channels": ["mychannel","myotherchannel"]) of channels
+  	* channels is a table containing one channel (e.g. "channels": [ "mychannel" ] ) or a list of channels (e.g. "channels": ["mychannel","myotherchannel"] )
 ```json
 {
 	"username": "mybot",
