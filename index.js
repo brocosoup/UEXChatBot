@@ -3,13 +3,14 @@ import fetch from 'node-fetch';
 import fs from 'node:fs';
 import server from './server.cjs';
 
-let rawdata = fs.readFileSync('settings.json');
-let config = JSON.parse(rawdata);
-let rawlocale = fs.readFileSync('locale.json');
-let locale = JSON.parse(rawlocale);
+let rawdata = await fs.readFileSync('settings.json');
+let config = await JSON.parse(rawdata);
+let rawlocale = await fs.readFileSync('locale.json');
+let locale = await JSON.parse(rawlocale);
 
 			  
 console.log(locale);
+console.log(config);
 // Define configuration options
 const ship_url = 'https://portal.uexcorp.space/api/ships/';
 const tradeports_url = 'https://portal.uexcorp.space/api/tradeports/system/ST/'
@@ -25,8 +26,8 @@ const api_settings = {
 
 const twitch_options = {
   identity: {
-    'username': config.username,
-    'password': config.password
+    'username': config.identity.username,
+    'password': config.identity.password
   },
   channels: config.channels
 };
@@ -85,7 +86,8 @@ if (jsonTradeportsData['code'] == 200)
 
 
 var profile = []
-if (twitch_options.identity.password == '' || twitch_options.identity.password == undefined)
+console.log(config);
+if (config.identity.password == undefined || config.identity.password == '')
 {
 	server.runAuthServ();
 	console.log('Waiting for auth: go to http://localhost:3000');
@@ -102,7 +104,7 @@ if (twitch_options.identity.password == '' || twitch_options.identity.password =
 	  if (err)
 		  console.log(err);
 	  else 
-		  console.log("settings updated successfully\n");
+		  console.log("settings.json updated successfully\n");
 	});
 	server.kill();
 }
@@ -324,25 +326,25 @@ function onMessageHandler (target, context, msg, self) {
 		  {
 			  const res = getShipPrice(commandArgs,'rent')
 			  if (res != undefined) {
-				sendMe(target, res);
+				sendMe(target, res, context);
 			  }
 		  } else if (commandName.toLowerCase() == '!' + locale.shipbuy_command)
 		  {
 			  const res = getShipPrice(commandArgs,'buy')
 			  if (res != undefined) {
-				sendMe(target, res);
+				sendMe(target, res, context);
 			  }
 		  } else if (commandName.toLowerCase() == '!' + locale.infobuy_command)
 		  {
 			  const res = getCommoditiesPrice(commandArgs,'buy')
 			  if (res != undefined) {
-				sendMe(target, res);
+				sendMe(target, res, context);
 			  }
 		  } else if (commandName.toLowerCase() == '!' + locale.infosell_command)
 		  {
 			  const res = getCommoditiesPrice(commandArgs,'sell')
 			  if (res != undefined) {
-				sendMe(target, res);
+				sendMe(target, res, context);
 			  }
 		  }
 		  
@@ -364,7 +366,7 @@ function onMessageHandler (target, context, msg, self) {
   }
 }
 
-function sendMe(target, message)
+function sendMe(target, message, context)
 {
 	const posLimit = 400;
 	var msgArray = [];
@@ -377,11 +379,11 @@ function sendMe(target, message)
 			var pos = message.indexOf('aUEC ',posLimit) + 5;
 			msgArray.push(message.substr(0, pos));
 			message = message.substr(pos, message.length);
+			
 		}
 	}
 	for (var msg in msgArray)
 	{
-		// console.log(msgArray[msg]);
 		client.say(target,msgArray[msg])
 	}
 }
