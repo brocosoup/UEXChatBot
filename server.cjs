@@ -10,13 +10,13 @@ or in the "license" file accompanying this file. This file is distributed on an 
 */
 
 // Define our dependencies
-var express        = require('express');
-var session        = require('express-session');
-var passport       = require('passport');
+var express = require('express');
+var session = require('express-session');
+var passport = require('passport');
 var OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
-var request        = require('request');
-var handlebars     = require('handlebars');
-var fs			   = require('fs');
+var request = require('request');
+var handlebars = require('handlebars');
+var fs = require('fs');
 
 let rawdata = fs.readFileSync('settings.json');
 let config = JSON.parse(rawdata);
@@ -24,20 +24,20 @@ let config = JSON.parse(rawdata);
 
 // Define our constants, you will change these with your own
 const TWITCH_CLIENT_ID = config.server.client;
-const TWITCH_SECRET    = config.server.secret;
-const SESSION_SECRET   = config.server.session;
-const CALLBACK_URL     = config.server.callback; // You can run locally with - http://localhost:3000/auth/twitch/callback
+const TWITCH_SECRET = config.server.secret;
+const SESSION_SECRET = config.server.session;
+const CALLBACK_URL = config.server.callback; // You can run locally with - http://localhost:3000/auth/twitch/callback
 
 var loggedinUser = '';
 // Initialize Express and middlewares
 var app = express();
-app.use(session({secret: SESSION_SECRET, resave: false, saveUninitialized: false}));
+app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }));
 app.use(express.static('public'));
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Override passport profile function to get user profile from Twitch API
-OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
+OAuth2Strategy.prototype.userProfile = function (accessToken, done) {
   var options = {
     url: 'https://api.twitch.tv/helix/users',
     method: 'GET',
@@ -57,51 +57,50 @@ OAuth2Strategy.prototype.userProfile = function(accessToken, done) {
   });
 }
 
-passport.serializeUser(function(user, done) {
-    done(null, user);
+passport.serializeUser(function (user, done) {
+  done(null, user);
 });
 
-passport.deserializeUser(function(user, done) {
-    done(null, user);
+passport.deserializeUser(function (user, done) {
+  done(null, user);
 });
 
 
 
 passport.use('twitch', new OAuth2Strategy({
-    authorizationURL: 'https://id.twitch.tv/oauth2/authorize',
-    tokenURL: 'https://id.twitch.tv/oauth2/token',
-    clientID: TWITCH_CLIENT_ID,
-    clientSecret: TWITCH_SECRET,
-    callbackURL: CALLBACK_URL,
-    state: true
-  },
-  function(accessToken, refreshToken, profile, done) {
+  authorizationURL: 'https://id.twitch.tv/oauth2/authorize',
+  tokenURL: 'https://id.twitch.tv/oauth2/token',
+  clientID: TWITCH_CLIENT_ID,
+  clientSecret: TWITCH_SECRET,
+  callbackURL: CALLBACK_URL,
+  state: true
+},
+  function (accessToken, refreshToken, profile, done) {
     profile.accessToken = accessToken;
     profile.refreshToken = refreshToken;
-	profile.display_name = profile.data[0].display_name;
-	profile.bio = profile.data[0].description;
-	profile.logo = profile.data[0].profile_image_url;
+    profile.display_name = profile.data[0].display_name;
+    profile.bio = profile.data[0].description;
+    profile.logo = profile.data[0].profile_image_url;
     // Securely store user profile in your DB
     //User.findOrCreate(..., function(err, user) {
     //  done(err, user);
     //});
-	loggedinUser = profile;
+    loggedinUser = profile;
     done(null, profile);
   }
 ));
 
 var server;
 
-function runAuthServ()
-{
-	// Set route to start OAuth link, this is where you define scopes to request
-	app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read','chat:read','chat:edit'] }));
+function runAuthServ() {
+  // Set route to start OAuth link, this is where you define scopes to request
+  app.get('/auth/twitch', passport.authenticate('twitch', { scope: ['user_read', 'chat:read', 'chat:edit'] }));
 
-	// Set route for OAuth redirect
-	app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/', failureRedirect: '/' }));
+  // Set route for OAuth redirect
+  app.get('/auth/twitch/callback', passport.authenticate('twitch', { successRedirect: '/', failureRedirect: '/' }));
 
-	// Define a simple template to safely generate HTML with values from user's profile
-	var template = handlebars.compile(`
+  // Define a simple template to safely generate HTML with values from user's profile
+  var template = handlebars.compile(`
 	<html><head><title>UEXChatBot</title></head>
 	<center><h1>UEXChatBot</h1>
 	<table>
@@ -110,32 +109,30 @@ function runAuthServ()
 		<tr><th>Refresh Token</th><td></td><td>{{refreshToken}}</td></tr>
 	</table></center></html>`);
 
-	// If user has an authenticated session, display it, otherwise display link to authenticate
-	app.get('/', function (req, res) {
-	  if(req.session && req.session.passport && req.session.passport.user) {
-		res.send(template(req.session.passport.user));
-	  } else {
-		res.send('<html><head><title>UEXChatBot</title></head><body><center><h1>UEXChatBot</h1><a href="/auth/twitch"><h2>Authentifiez vous avec twitch</h2></a></center></body></html>');
-	  }
-	});
+  // If user has an authenticated session, display it, otherwise display link to authenticate
+  app.get('/', function (req, res) {
+    if (req.session && req.session.passport && req.session.passport.user) {
+      res.send(template(req.session.passport.user));
+    } else {
+      res.send('<html><head><title>UEXChatBot</title></head><body><center><h1>UEXChatBot</h1><a href="/auth/twitch"><h2>Authentifiez vous avec twitch</h2></a></center></body></html>');
+    }
+  });
 
-	server = app.listen(3000, function () {
-	  console.log('Authentication server listening on port 3000!')
-	});
+  server = app.listen(3000, function () {
+    console.log('Authentication server listening on port 3000!')
+  });
 }
 
-function getProfile()
-{
-	return loggedinUser;
+function getProfile() {
+  return loggedinUser;
 }
 
-function kill()
-{
-	server.close();
+function kill() {
+  server.close();
 }
 
 module.exports = {
-    runAuthServ,
-	getProfile,
-	kill
+  runAuthServ,
+  getProfile,
+  kill
 };
