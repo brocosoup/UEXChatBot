@@ -31,8 +31,6 @@ initJSONFile('server');
 let rawdata = fs.readFileSync('server.json');
 let config = JSON.parse(rawdata);
 
-var credentials = {key: config.server.privateKey, cert: config.server.certificate};
-
 // Define our constants, you will change these with your own
 const TWITCH_CLIENT_ID = config.server.client;
 const TWITCH_SECRET = config.server.secret;
@@ -128,9 +126,14 @@ function runAuthServ() {
       res.send('<html><head><title>UEXChatBot</title></head><body><center><h1>UEXChatBot</h1><a href="/auth/twitch"><h2>Authentifiez vous avec twitch</h2></a></center></body></html>');
     }
   });
+  
 
-  if (credentials.key != undefined && credentials.key != '' )
+  if (config.server.privateKey != undefined && config.server.privateKey != '' && config.server.certificate != undefined && config.server.certificate != '')
   {
+    var privateKey = fs.readFileSync(config.server.privateKey).toString();
+    var certificate = fs.readFileSync(config.server.certificate).toString();
+    
+    var credentials = {key: privateKey, cert: certificate};
     server = https.createServer(credentials, app).listen(3000, function () {
       console.log('Secure Authentication server listening on port 3000!')
     });
