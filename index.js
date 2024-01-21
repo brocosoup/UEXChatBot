@@ -381,6 +381,8 @@ function onMessageHandler(target, context, msg, self) {
 				sendMe(target, computeMessage(locale.shipbuy_usage, []));
 			} else if (commandName == '!' + locale.help_command) {
 				sendMe(target, computeMessage(locale.help_message, []));
+			} else if (commandName == '!coucou') {
+				sendMe(target, 'Hé coucou toi!');
 			}
 		}
 
