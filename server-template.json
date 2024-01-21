@@ -3,6 +3,7 @@
 		"client": "changeme",
 		"secret": "changeme",
 		"session": "changeme",
-		"callback": "http://localhost:3000/auth/twitch/callback"
+		"callback": "http://localhost:3000/auth/twitch/callback",
+		"port": 3000
 	}
 }
