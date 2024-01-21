@@ -1,8 +1,0 @@
-{
-	"server": {
-		"client": "dctu1z9dw43sclpqyqpoovxt7kfqx4",
-		"secret": "bl8980n2f95fyimox19nc7fkqauhxg",
-		"session": "bl8980n2f95fyimox19nc7fkqauhxg",
-		"callback": "http://localhost:3000/auth/twitch/callback"
-	}
-}
