@@ -16,7 +16,7 @@ const locale = await JSON.parse(rawlocale);
 
 initJSONFile('settings');
 var config = JSON.parse(fs.readFileSync("settings.json"));
-if (config.identity.password == undefined || config.identity.password == '') {
+if (config.identity.password == undefined || config.identity.password == '' || (process.argv[2] && process.argv[2] === '-f')) {
 	let profile = []
 	server.runAuthServ();
 	console.log('Waiting for auth: go now to http://localhost:3000 to continue');
