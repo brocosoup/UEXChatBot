@@ -2,27 +2,44 @@ import tmi from 'tmi.js';
 import fetch from 'node-fetch';
 import fs from 'node:fs';
 import server from './server.cjs';
+import { exit } from 'node:process';
 
-function initJSONFile(file)
-{
+function initJSONFile(file) {
 	if (!fs.existsSync(file + '.json')) {
 		fs.writeFileSync(file + '.json', fs.readFileSync(file + '-template.json'))
 	}
 }
 
-initJSONFile('settings');
-let rawdata = fs.readFileSync('settings.json');
-let config = await JSON.parse(rawdata);
-
 initJSONFile('locale');
 let rawlocale = fs.readFileSync('locale.json');
-let locale = await JSON.parse(rawlocale);
+const locale = await JSON.parse(rawlocale);
 
-// Define configuration options
-const api_url = 'https://portal.uexcorp.space/';
-const ship_url = 'https://portal.uexcorp.space/api/ships/';
-const tradeports_url = 'https://portal.uexcorp.space/api/tradeports/system/ST/'
-const commodities_url = 'https://portal.uexcorp.space/api/commodities/'
+initJSONFile('settings');
+var config = JSON.parse(fs.readFileSync("settings.json"));
+if (config.identity.password == undefined || config.identity.password == '') {
+	let profile = []
+	server.runAuthServ();
+	console.log('Waiting for auth: go now to http://localhost:3000 to continue');
+	while (profile == '') {
+		profile = server.getProfile()
+		await new Promise(r => setTimeout(r, 2000));
+	}
+	config.identity.username = profile.data[0].display_name.toLowerCase();
+	config.identity.password = 'oauth:' + profile.accessToken;
+	if (config.channels[0] === '')
+		config.channels = [profile.data[0].display_name.toLowerCase()];
+	fs.writeFileSync("settings.json", JSON.stringify(config))
+	server.close();
+}
+
+if (config.api_key == '') {
+	if (!fs.existsSync('jsonCommoditiesData.json') || !fs.existsSync('jsonShipData.json') || !fs.existsSync('jsonTradeportsData.json')) {
+		console.log('You have no api_key and no local files. I will now shutdown.');
+		exit(2);
+	} else {
+		console.log('You UEX api_key is empty in settings.json, I will not update the data!');
+	}
+}
 
 const api_settings = {
 	method: 'GET',
@@ -32,99 +49,82 @@ const api_settings = {
 	},
 };
 
-var twitch_options = {
-	server: {
-		'client': config.server.client,
-		'secret': config.server.secret,
-		'session': config.server.session,
-		'callback': config.server.callback
-	},
+var jsonShipData = {};
+var jsonCommoditiesData = {};
+var jsonTradeportsData = {};
+
+refreshAPI();
+
+function refreshAPI() {
+	let apicalls = [
+		'https://portal.uexcorp.space/api/ships/',
+		'https://portal.uexcorp.space/api/tradeports/system/ST/',
+		'https://portal.uexcorp.space/api/commodities/'
+	];
+	let requests = apicalls.map(async function (url) {
+		const response = await fetch(url, api_settings);
+		return await response.json();
+	});
+
+	Promise.all(requests)
+		.then((results) => {
+			jsonShipData = results[0];
+			if (jsonShipData['code'] == 200) {
+				fs.writeFile("jsonShipData.json", JSON.stringify(jsonShipData), (err) => {
+					if (err)
+						console.log(err);
+					else
+						console.log("jsonShipData written successfully\n");
+				});
+			} else {
+				var rawShipdata = fs.readFileSync('jsonShipData.json');
+				jsonShipData = JSON.parse(rawShipdata);
+				console.log('Using local data for jsonShipData');
+			}
+
+			jsonCommoditiesData = results[2];
+			if (jsonCommoditiesData['code'] == 200) {
+				fs.writeFile("jsonCommoditiesData.json", JSON.stringify(jsonCommoditiesData), (err) => {
+					if (err)
+						console.log(err);
+					else
+						console.log("jsonCommoditiesData written successfully\n");
+				});
+			} else {
+				var rawCommoditiesdata = fs.readFileSync('jsonCommoditiesData.json');
+				jsonCommoditiesData = JSON.parse(rawCommoditiesdata);
+				console.log('Using local data for jsonCommoditiesData');
+			}
+
+			jsonTradeportsData = results[1];
+			if (jsonTradeportsData['code'] == 200) {
+				fs.writeFile("jsonTradeportsData.json", JSON.stringify(jsonTradeportsData), (err) => {
+					if (err)
+						console.log(err);
+					else
+						console.log("jsonTradeportsData written successfully\n");
+				});
+			} else {
+				var rawTradeportsdata = fs.readFileSync('jsonTradeportsData.json');
+				jsonTradeportsData = JSON.parse(rawTradeportsdata);
+				console.log('Using local data for jsonTradeportsData');
+			}
+		}).catch(function(err) {
+			console.log(err);
+		})
+
+}
+
+// Connect to Twitch:
+// Create a client with our options
+const twitch_options = {
 	identity: {
 		'username': config.identity.username,
 		'password': config.identity.password
 	},
 	channels: config.channels,
-	api_key: config.api_key
-
 };
 
-if (config.api_key == '') {
-	console.log('You UEX api_key is empty in settings.json, I will not update the data!');
-}
-
-const shipData = await fetch(ship_url, api_settings);
-var jsonShipData = await shipData.json();
-if (jsonShipData['code'] == 200) {
-	fs.writeFile("jsonShipData.json", JSON.stringify(jsonShipData), (err) => {
-		if (err)
-			console.log(err);
-		else
-			console.log("jsonShipData written successfully\n");
-	});
-} else {
-	var rawShipdata = await fs.readFileSync('jsonShipData.json');
-	jsonShipData = await JSON.parse(rawShipdata);
-	console.log('Using local data for jsonShipData');
-}
-
-const commoditiesData = await fetch(commodities_url, api_settings);
-var jsonCommoditiesData = await commoditiesData.json();
-if (jsonCommoditiesData['code'] == 200) {
-	fs.writeFile("jsonCommoditiesData.json", JSON.stringify(jsonCommoditiesData), (err) => {
-		if (err)
-			console.log(err);
-		else
-			console.log("jsonCommoditiesData written successfully\n");
-	});
-} else {
-	var rawCommoditiesdata = fs.readFileSync('jsonCommoditiesData.json');
-	jsonCommoditiesData = JSON.parse(rawCommoditiesdata);
-	console.log('Using local data for jsonCommoditiesData');
-}
-const tradeportsData = await fetch(tradeports_url, api_settings);
-var jsonTradeportsData = await tradeportsData.json();
-if (jsonTradeportsData['code'] == 200) {
-	fs.writeFile("jsonTradeportsData.json", JSON.stringify(jsonTradeportsData), (err) => {
-		if (err)
-			console.log(err);
-		else
-			console.log("jsonTradeportsData written successfully\n");
-	});
-} else {
-	var rawTradeportsdata = fs.readFileSync('jsonTradeportsData.json');
-	jsonTradeportsData = JSON.parse(rawTradeportsdata);
-	console.log('Using local data for jsonTradeportsData');
-}
-
-
-var profile = []
-if (config.identity.password == undefined || config.identity.password == '') {
-	server.runAuthServ();
-	console.log('Waiting for auth: go to http://localhost:3000');
-	while (profile == '') {
-		profile = server.getProfile()
-		await new Promise(r => setTimeout(r, 2000));
-	}
-	twitch_options.identity.username = profile.data[0].display_name.toLowerCase();
-	twitch_options.identity.password = 'oauth:' + profile.accessToken
-	twitch_options.channels = config.channels;
-	twitch_options.api_key = config.api_key
-	console.log(config);
-	console.log(config.server.client);
-	twitch_options.server.client = config.server.client
-	twitch_options.server.secret = config.server.secret
-	twitch_options.server.session = config.server.session
-	twitch_options.server.callback = config.server.callback
-	fs.writeFile("settings.json", JSON.stringify(twitch_options), (err) => {
-		if (err)
-			console.log(err);
-		else
-			console.log("settings.json updated successfully\n");
-	});
-	server.kill();
-}
-// Connect to Twitch:
-// Create a client with our options
 const client = new tmi.client(twitch_options);
 
 // Register our event handlers (defined below)
@@ -270,7 +270,7 @@ function compareComByPriceAsc(a, b) {
 }
 
 function getListCommodities(commName) {
-	var listCommodities = []
+	let listCommodities = [];
 	for (var commodID in jsonCommoditiesData.data) {
 		if (jsonCommoditiesData.data[commodID]['name'].toLowerCase() == commName.toLowerCase()) {
 			listCommodities.push(jsonCommoditiesData.data[commodID]['name']);

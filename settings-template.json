@@ -1,16 +1,10 @@
 {
-	"server": {
-		"client": "",
-		"secret": "",
-		"session": "",
-		"callback": "http://localhost:3000/auth/twitch/callback"
-	},
-	"identity": {
-		"username": "",
-		"password": ""
-	},
-	"channels": [
-		""
-	],
-	"api_key": ""
+    "identity": {
+        "username": "",
+        "password": ""
+    },
+    "channels": [
+        ""
+    ],
+    "api_key": ""
 }

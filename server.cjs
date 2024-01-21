@@ -18,7 +18,16 @@ var request = require('request');
 var handlebars = require('handlebars');
 var fs = require('fs');
 
-let rawdata = fs.readFileSync('settings.json');
+
+function initJSONFile(file)
+{
+	if (!fs.existsSync(file + '.json')) {
+		fs.writeFileSync(file + '.json', fs.readFileSync(file + '-template.json'))
+	}
+}
+
+initJSONFile('server');
+let rawdata = fs.readFileSync('server.json');
 let config = JSON.parse(rawdata);
 
 
@@ -127,12 +136,12 @@ function getProfile() {
   return loggedinUser;
 }
 
-function kill() {
+function close() {
   server.close();
 }
 
 module.exports = {
   runAuthServ,
   getProfile,
-  kill
+  close
 };
