@@ -19,7 +19,7 @@ var config = JSON.parse(fs.readFileSync("settings.json"));
 if (config.identity.password == undefined || config.identity.password == '' || (process.argv[2] && process.argv[2] === '-f')) {
 	let profile = []
 	server.runAuthServ();
-	console.log('Waiting for auth: go now to http://localhost:3000 to continue');
+	console.log('Waiting for auth: go now to http://<hostname>:3000 to continue');
 	while (profile == '') {
 		profile = server.getProfile()
 		await new Promise(r => setTimeout(r, 2000));

@@ -17,7 +17,8 @@ var OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 var request = require('request');
 var handlebars = require('handlebars');
 var fs = require('fs');
-
+var https = require('https');
+var http = require('http');
 
 function initJSONFile(file)
 {
@@ -30,6 +31,7 @@ initJSONFile('server');
 let rawdata = fs.readFileSync('server.json');
 let config = JSON.parse(rawdata);
 
+var credentials = {key: config.server.privateKey, cert: config.server.certificate};
 
 // Define our constants, you will change these with your own
 const TWITCH_CLIENT_ID = config.server.client;
@@ -127,9 +129,16 @@ function runAuthServ() {
     }
   });
 
-  server = app.listen(3000, function () {
-    console.log('Authentication server listening on port 3000!')
-  });
+  if (credentials.key != undefined && credentials.key != '' )
+  {
+    server = https.createServer(credentials, app).listen(3000, function () {
+      console.log('Secure Authentication server listening on port 3000!')
+    });
+  } else {
+    server = app.listen(3000, function () {
+      console.log('Authentication server listening on port 3000!')
+    });
+  }
 }
 
 function getProfile() {
