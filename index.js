@@ -3,12 +3,23 @@ import fetch from 'node-fetch';
 import fs from 'node:fs';
 import server from './server.cjs';
 
-let rawdata = await fs.readFileSync('settings.json');
+function initJSONFile(file)
+{
+	if (!fs.existsSync(file + '.json')) {
+		fs.writeFileSync(file + '.json', fs.readFileSync(file + '-template.json'))
+	}
+}
+
+initJSONFile('settings');
+let rawdata = fs.readFileSync('settings.json');
 let config = await JSON.parse(rawdata);
-let rawlocale = await fs.readFileSync('locale.json');
+
+initJSONFile('locale');
+let rawlocale = fs.readFileSync('locale.json');
 let locale = await JSON.parse(rawlocale);
 
 // Define configuration options
+const api_url = 'https://portal.uexcorp.space/';
 const ship_url = 'https://portal.uexcorp.space/api/ships/';
 const tradeports_url = 'https://portal.uexcorp.space/api/tradeports/system/ST/'
 const commodities_url = 'https://portal.uexcorp.space/api/commodities/'
