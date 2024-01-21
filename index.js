@@ -144,17 +144,6 @@ function computeMessage(message, table) {
 	}
 	return computedMessage;
 }
-function getNbShip(shipName) {
-	var nbShips = 0
-	for (var ship in jsonShipData.data) {
-		if (jsonShipData.data[ship]['name'].toLowerCase() == shipName.toLowerCase()) {
-			return 1;
-		} else if (jsonShipData.data[ship]['name'].toLowerCase().includes(shipName.toLowerCase())) {
-			nbShips = nbShips + 1
-		}
-	}
-	return nbShips;
-}
 
 function getShipList(shipName) {
 	var shipsList = []
@@ -362,12 +351,21 @@ function onMessageHandler(target, context, msg, self) {
 					sendMe(target, res, context);
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.infobuy_command) {
-				const res = getCommoditiesPrice(commandArgs, 'buy')
+				const res = getCommoditiesPrice(commandArgs, 'buy',locale.infobuy_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.infosell_command) {
-				const res = getCommoditiesPrice(commandArgs, 'sell')
+				const res = getCommoditiesPrice(commandArgs, 'sell',locale.infosell_limit)
+				if (res != undefined) {
+					sendMe(target, res, context);
+				}
+			} else if (commandName.toLowerCase() == '!' + locale.trade_command) {
+				var res = getCommoditiesPrice(commandArgs, 'buy',locale.trade_limit)
+				if (res != undefined) {
+					sendMe(target, res, context);
+				}
+				res = getCommoditiesPrice(commandArgs, 'sell',locale.trade_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
@@ -376,13 +374,19 @@ function onMessageHandler(target, context, msg, self) {
 		} else {
 			const commandName = msg.trim();
 			if (commandName == '!' + locale.shiprent_command) {
-				sendMe(target, computeMessage(locale.shiprent_usage, []));
+				sendMe(target, computeMessage(locale.shiprent_usage, [locale.shiprent_command]));
 			} else if (commandName == '!' + locale.shipbuy_command) {
-				sendMe(target, computeMessage(locale.shipbuy_usage, []));
+				sendMe(target, computeMessage(locale.shipbuy_usage, [locale.shipbuy_command]));
 			} else if (commandName == '!' + locale.help_command) {
-				sendMe(target, computeMessage(locale.help_message, []));
-			} else if (commandName == '!coucou') {
-				sendMe(target, 'Hé coucou toi!');
+				sendMe(target, computeMessage(locale.help_message, [locale.help_command]));
+			} else if (commandName == '!' + locale.infosell_command) {
+				sendMe(target, computeMessage(locale.infosell_usage, [locale.infosell_command]));
+			} else if (commandName == '!' + locale.infobuy_command) {
+				sendMe(target, computeMessage(locale.infobuy_usage, [locale.infobuy_command]));
+			} else if (commandName == '!' + locale.coucou_command) {
+				sendMe(target, computeMessage(locale.coucou_message, [locale.coucou_command]));
+			} else if (commandName == '!' + locale.trade_command) {
+				sendMe(target, computeMessage(locale.trade_usage, [locale.trade_command]));
 			}
 		}
 

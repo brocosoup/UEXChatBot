@@ -8,9 +8,6 @@
 	"ship_only_one": "Désolé, vous devez sélectionner un seul ship %%1",
 	"ship_too_much": "Désolé, j'ai trouvé trop de ships correspondants(%%1)",
 	"ship_no_ship": "Désolé, je n'ai trouvé aucun ship correspondant. Vas t'acheter un Carrack sur le site de Chris",
-	"shiprent_usage": "C'est pas comme ça ! !shiprent Carrack",
-	"shipbuy_usage": "C'est pas comme ça ! !shipbuy Carrack",
-	"help_message": "Salut PixelBob, tu peux faire les commandes suivantes ModLove !shiprent Carrack et !shipbuy Carrack. ModLove ",
 	"commodities_found": "KomodoHype J'ai trouvé ceci pour %%1 KomodoHype ",
 	"commodities_buy": " %%1(%%2) vends pour %%3 aUEC HolidayPresent",
 	"commodities_sell": " %%1(%%2) achète pour %%3 aUEC HolidayPresent",
@@ -22,5 +19,17 @@
 	"shiprent_command": "shiprent",
 	"infobuy_command": "infobuy",
 	"infosell_command": "infosell",
-	"help_command": "help"
+	"trade_command": "trade",
+	"help_command": "help",
+	"coucou_command": "coucou",
+	"infosell_limit": 3,
+	"infobuy_limit": 3,
+	"trade_limit": 1,
+	"shiprent_usage": "C'est pas comme ça ! %%1 Carrack",
+	"shipbuy_usage": "C'est pas comme ça ! %%1 Carrack",
+	"infosell_usage": "C'est pas comme ça ! %%1 Neon",
+	"infobuy_usage": "C'est pas comme ça ! %%1 Neon",
+	"trade_usage": "C'est pas comme ça ! %%1 Neon",
+	"help_message": "Salut PixelBob, tu peux faire les commandes suivantes ModLove !shiprent Carrack et !shipbuy Carrack. ModLove ",
+	"coucou_message": "Hé! Coucou toi ! waterpHey waterpHey"
 }
