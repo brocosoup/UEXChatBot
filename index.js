@@ -109,7 +109,7 @@ function refreshAPI() {
 				jsonTradeportsData = JSON.parse(rawTradeportsdata);
 				console.log('Using local data for jsonTradeportsData');
 			}
-		}).catch(function(err) {
+		}).catch(function (err) {
 			console.log(err);
 		})
 
@@ -170,7 +170,7 @@ function getNbLoc(shipName, type) {
 	return nbLocs;
 }
 
-function getShipPrice(shipName, type,max) {
+function getShipPrice(shipName, type, max) {
 	var listShips = getShipList(shipName);
 	var nbShips = listShips.length;
 	var message = '';
@@ -203,7 +203,7 @@ function getShipPrice(shipName, type,max) {
 						if (locStoreName == '(null)')
 							locStoreName = '';
 						var apiShipPrice = jsonShipData.data[ship][type + '_at'][loc]['price'].toLocaleString('en-US')
-						
+
 						//apiShipName, locSystemName, locCityName, locStoreName, apiShipPrice, type
 						ListOfShipsLocs.push({ 'apiShipName': apiShipName, 'locSystemName': locSystemName, 'locCityName': locCityName, 'locStoreName': locStoreName, 'apiShipPrice': apiShipPrice, 'type': type })
 						// console.log(message);
@@ -213,8 +213,7 @@ function getShipPrice(shipName, type,max) {
 			}
 			ListOfShipsLocs.sort(compareShipByPriceDesc);
 			var limit = 0;
-			for (var locality in ListOfShipsLocs)
-			{
+			for (var locality in ListOfShipsLocs) {
 				if (locality >= max) {
 					break;
 				}
@@ -293,7 +292,7 @@ function getListCommodities(commName) {
 	let listCommodities = [];
 	for (var commodID in jsonCommoditiesData.data) {
 		if (jsonCommoditiesData.data[commodID]['name'].toLowerCase() == commName.toLowerCase()) {
-			listCommodities=[jsonCommoditiesData.data[commodID]['name']];
+			listCommodities = [jsonCommoditiesData.data[commodID]['name']];
 			return listCommodities;
 		} else if (jsonCommoditiesData.data[commodID]['name'].toLowerCase().includes(commName.toLowerCase())) {
 			listCommodities.push(jsonCommoditiesData.data[commodID]['name']);
@@ -302,7 +301,7 @@ function getListCommodities(commName) {
 	return listCommodities;
 }
 
-function getCommoditiesPrice(commName, type,max) {
+function getCommoditiesPrice(commName, type, max) {
 	const listCommodities = getListCommodities(commName)
 	var message = ''
 	if (listCommodities.length == 1) {
@@ -341,7 +340,7 @@ function getCommoditiesPrice(commName, type,max) {
 				message = message + ' ' + computeMessage(locale.commodities_buy, [ListOfCommodities[commodity]['code'], ListOfCommodities[commodity]['localisation'], ListOfCommodities[commodity]['price'].toLocaleString('en-US')])
 			else
 				message = message + ' ' + computeMessage(locale.commodities_sell, [ListOfCommodities[commodity]['code'], ListOfCommodities[commodity]['localisation'], ListOfCommodities[commodity]['price'].toLocaleString('en-US')])
-			
+
 
 		}
 	} else if (listCommodities.length < 10 && listCommodities.length > 0) {
@@ -372,28 +371,28 @@ function onMessageHandler(target, context, msg, self) {
 
 			// If the command is known, let's execute it
 			if (commandName.toLowerCase() == '!' + locale.shiprent_command) {
-				const res = getShipPrice(commandArgs, 'rent',locale.shiprent_limit)
+				const res = getShipPrice(commandArgs, 'rent', locale.shiprent_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.shipbuy_command) {
-				const res = getShipPrice(commandArgs, 'buy',locale.shipbuy_limit)
+				const res = getShipPrice(commandArgs, 'buy', locale.shipbuy_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.infobuy_command) {
-				const res = getCommoditiesPrice(commandArgs, 'buy',locale.infobuy_limit)
+				const res = getCommoditiesPrice(commandArgs, 'buy', locale.infobuy_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.infosell_command) {
-				const res = getCommoditiesPrice(commandArgs, 'sell',locale.infosell_limit)
+				const res = getCommoditiesPrice(commandArgs, 'sell', locale.infosell_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.trade_command) {
-				var res = getCommoditiesPrice(commandArgs, 'buy',locale.trade_limit)
-				res = res + ' <=> ' + getCommoditiesPrice(commandArgs, 'sell',locale.trade_limit)
+				var res = getCommoditiesPrice(commandArgs, 'buy', locale.trade_limit)
+				res = res + ' <=> ' + getCommoditiesPrice(commandArgs, 'sell', locale.trade_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
@@ -406,7 +405,7 @@ function onMessageHandler(target, context, msg, self) {
 			} else if (commandName == '!' + locale.shipbuy_command) {
 				sendMe(target, computeMessage(locale.shipbuy_usage, [locale.shipbuy_command]));
 			} else if (commandName == '!' + locale.help_command) {
-				sendMe(target, computeMessage(locale.help_message, [locale.shiprent_command,locale.shipbuy_command,locale.infosell_command,locale.infobuy_command,locale.coucou_command,locale.trade_command]));
+				sendMe(target, computeMessage(locale.help_message, [locale.shiprent_command, locale.shipbuy_command, locale.infosell_command, locale.infobuy_command, locale.coucou_command, locale.trade_command]));
 			} else if (commandName == '!' + locale.infosell_command) {
 				sendMe(target, computeMessage(locale.infosell_usage, [locale.infosell_command]));
 			} else if (commandName == '!' + locale.infobuy_command) {
