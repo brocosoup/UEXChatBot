@@ -262,7 +262,7 @@ function getListCommodities(commName) {
 	let listCommodities = [];
 	for (var commodID in jsonCommoditiesData.data) {
 		if (jsonCommoditiesData.data[commodID]['name'].toLowerCase() == commName.toLowerCase()) {
-			listCommodities.push(jsonCommoditiesData.data[commodID]['name']);
+			listCommodities=[jsonCommoditiesData.data[commodID]['name']];
 			return listCommodities;
 		} else if (jsonCommoditiesData.data[commodID]['name'].toLowerCase().includes(commName.toLowerCase())) {
 			listCommodities.push(jsonCommoditiesData.data[commodID]['name']);
@@ -274,6 +274,7 @@ function getListCommodities(commName) {
 function getCommoditiesPrice(commName, type) {
 	const listCommodities = getListCommodities(commName)
 	var message = ''
+	console.log(listCommodities);
 	if (listCommodities.length == 1) {
 		var ListOfCommodities = [];
 		for (var tradeport in jsonTradeportsData.data) {
