@@ -196,6 +196,8 @@ function getShipPrice(shipName, type) {
 						var locCityName = jsonShipData.data[ship][type + '_at'][loc]['city_name'];
 						if (locCityName == undefined)
 							locCityName = jsonShipData.data[ship][type + '_at'][loc]['tradeport'];
+						if (locCityName == undefined)
+							locCityName = jsonShipData.data[ship][type + '_at'][loc]['planet_name'];
 						var locStoreName = '(' + jsonShipData.data[ship][type + '_at'][loc]['store_name'] + ')';
 						if (locStoreName == '(null)')
 							locStoreName = '';
