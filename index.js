@@ -170,11 +170,12 @@ function getNbLoc(shipName, type) {
 	return nbLocs;
 }
 
-function getShipPrice(shipName, type) {
+function getShipPrice(shipName, type,max) {
 	var listShips = getShipList(shipName);
 	var nbShips = listShips.length;
 	var message = '';
 	if (listShips.length == 1) {
+		var ListOfShipsLocs = [];
 		var nbLocs = getNbLoc(listShips[0], type);
 		// console.log('Looking for \'' + listShips[0] + '\' and found ' + nbLocs + ' locations');
 		var message = '';
@@ -201,31 +202,38 @@ function getShipPrice(shipName, type) {
 						var locStoreName = '(' + jsonShipData.data[ship][type + '_at'][loc]['store_name'] + ')';
 						if (locStoreName == '(null)')
 							locStoreName = '';
-						var apiShipPrice = jsonShipData.data[ship][type + '_at'][loc]['price'].toLocaleString('en-US') + ' aUEC'
-						if (nbLocs == 1) {
-
-							// message = '(' + type + ') Le ' + apiShipName + ' est à ' + locSystemName + ' ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
-							message = computeMessage(locale.ship_available_oneloc, [apiShipName, locSystemName, locCityName, locStoreName, apiShipPrice, type]);
-							locID = locID + 1;
-						}
-						else if (nbLocs > 1) {
-							if (locID == 1) {
-								message = computeMessage(locale.ship_available_firstloc, [apiShipName, locSystemName, locCityName, locStoreName, apiShipPrice, type]);
-								locID = locID + 1;
-							} else if (locID == nbLocs) {
-								message = message + computeMessage(locale.ship_available_lastloc, [apiShipName, locSystemName, locCityName, locStoreName, apiShipPrice, type]);
-							} else {
-								message = message + computeMessage(locale.ship_available_nextloc, [apiShipName, locSystemName, locCityName, locStoreName, apiShipPrice, type]);
-								locID = locID + 1
-							}
-						}
+						var apiShipPrice = jsonShipData.data[ship][type + '_at'][loc]['price'].toLocaleString('en-US')
+						
+						//apiShipName, locSystemName, locCityName, locStoreName, apiShipPrice, type
+						ListOfShipsLocs.push({ 'apiShipName': apiShipName, 'locSystemName': locSystemName, 'locCityName': locCityName, 'locStoreName': locStoreName, 'apiShipPrice': apiShipPrice, 'type': type })
 						// console.log(message);
 					}
 
 				}
 			}
-		}
+			ListOfShipsLocs.sort(compareShipByPriceDesc);
+			var limit = 0;
+			for (var locality in ListOfShipsLocs)
+			{
+				if (ListOfShipsLocs.length == 1) {
 
+					// message = '(' + type + ') Le ' + apiShipName + ' est à ' + locSystemName + ' ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
+					message = computeMessage(locale.ship_available_oneloc, [ListOfShipsLocs[locality].apiShipName, ListOfShipsLocs[locality].locSystemName, ListOfShipsLocs[locality].locCityName, ListOfShipsLocs[locality].locStoreName, ListOfShipsLocs[locality].apiShipPrice, ListOfShipsLocs[locality].type]);
+				}
+				else if (ListOfShipsLocs.length > 1) {
+					if (locality == 0) {
+						message = computeMessage(locale.ship_available_firstloc, [ListOfShipsLocs[locality].apiShipName, ListOfShipsLocs[locality].locSystemName, ListOfShipsLocs[locality].locCityName, ListOfShipsLocs[locality].locStoreName, ListOfShipsLocs[locality].apiShipPrice, ListOfShipsLocs[locality].type]);
+					} else if (locality + 1 == ListOfShipsLocs.length) {
+						message = message + computeMessage(locale.ship_available_lastloc, [ListOfShipsLocs[locality].apiShipName, ListOfShipsLocs[locality].locSystemName, ListOfShipsLocs[locality].locCityName, ListOfShipsLocs[locality].locStoreName, ListOfShipsLocs[locality].apiShipPrice, ListOfShipsLocs[locality].type]);
+					} else {
+						message = message + computeMessage(locale.ship_available_nextloc, [ListOfShipsLocs[locality].apiShipName, ListOfShipsLocs[locality].locSystemName, ListOfShipsLocs[locality].locCityName, ListOfShipsLocs[locality].locStoreName, ListOfShipsLocs[locality].apiShipPrice, ListOfShipsLocs[locality].type]);
+					}
+				}
+				if (locality > max) {
+					break;
+				}
+			}
+		}
 	} else if (listShips.length > 1 && listShips.length < 10) {
 		// message = 'Désolé, vous devez sélectionner un seul ship ' + listShips;
 		message = computeMessage(locale.ship_only_one, [listShips]);
@@ -260,6 +268,27 @@ function compareComByPriceAsc(a, b) {
 	return 0;
 }
 
+function compareShipByPriceDesc(a, b) {
+
+	if (a.apiShipPrice < b.apiShipPrice) {
+		return -1;
+	}
+	if (a.apiShipPrice > b.apiShipPrice) {
+		return 1;
+	}
+	return 0;
+}
+function compareShipByPriceAsc(a, b) {
+
+	if (a.apiShipPrice < b.apiShipPrice) {
+		return 1;
+	}
+	if (a.apiShipPrice > b.apiShipPrice) {
+		return -1;
+	}
+	return 0;
+}
+
 function getListCommodities(commName) {
 	let listCommodities = [];
 	for (var commodID in jsonCommoditiesData.data) {
@@ -273,10 +302,9 @@ function getListCommodities(commName) {
 	return listCommodities;
 }
 
-function getCommoditiesPrice(commName, type) {
+function getCommoditiesPrice(commName, type,max) {
 	const listCommodities = getListCommodities(commName)
 	var message = ''
-	console.log(listCommodities);
 	if (listCommodities.length == 1) {
 		var ListOfCommodities = [];
 		for (var tradeport in jsonTradeportsData.data) {
@@ -299,7 +327,7 @@ function getCommoditiesPrice(commName, type) {
 			ListOfCommodities.sort(compareComByPriceDesc);
 		else if (type == 'sell')
 			ListOfCommodities.sort(compareComByPriceAsc);
-		var limit = 0;
+
 		for (var commodity in ListOfCommodities) {
 			// ListOfCommodities[commodity]
 
@@ -311,8 +339,8 @@ function getCommoditiesPrice(commName, type) {
 				message = message + ' ' + computeMessage(locale.commodities_buy, [ListOfCommodities[commodity]['code'], ListOfCommodities[commodity]['localisation'], ListOfCommodities[commodity]['price'].toLocaleString('en-US')])
 			else
 				message = message + ' ' + computeMessage(locale.commodities_sell, [ListOfCommodities[commodity]['code'], ListOfCommodities[commodity]['localisation'], ListOfCommodities[commodity]['price'].toLocaleString('en-US')])
-			limit = limit + 1;
-			if (limit > 3) {
+			
+			if (commodity > max) {
 				break;
 			}
 		}
@@ -344,12 +372,12 @@ function onMessageHandler(target, context, msg, self) {
 
 			// If the command is known, let's execute it
 			if (commandName.toLowerCase() == '!' + locale.shiprent_command) {
-				const res = getShipPrice(commandArgs, 'rent')
+				const res = getShipPrice(commandArgs, 'rent',locale.shiprent_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.shipbuy_command) {
-				const res = getShipPrice(commandArgs, 'buy')
+				const res = getShipPrice(commandArgs, 'buy',locale.shipbuy_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
@@ -365,10 +393,7 @@ function onMessageHandler(target, context, msg, self) {
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.trade_command) {
 				var res = getCommoditiesPrice(commandArgs, 'buy',locale.trade_limit)
-				if (res != undefined) {
-					sendMe(target, res, context);
-				}
-				res = getCommoditiesPrice(commandArgs, 'sell',locale.trade_limit)
+				res = res + ' <=> ' + getCommoditiesPrice(commandArgs, 'sell',locale.trade_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
