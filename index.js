@@ -215,6 +215,9 @@ function getShipPrice(shipName, type,max) {
 			var limit = 0;
 			for (var locality in ListOfShipsLocs)
 			{
+				if (locality >= max) {
+					break;
+				}
 				if (ListOfShipsLocs.length == 1) {
 
 					// message = '(' + type + ') Le ' + apiShipName + ' est à ' + locSystemName + ' ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
@@ -228,9 +231,6 @@ function getShipPrice(shipName, type,max) {
 					} else {
 						message = message + computeMessage(locale.ship_available_nextloc, [ListOfShipsLocs[locality].apiShipName, ListOfShipsLocs[locality].locSystemName, ListOfShipsLocs[locality].locCityName, ListOfShipsLocs[locality].locStoreName, ListOfShipsLocs[locality].apiShipPrice, ListOfShipsLocs[locality].type]);
 					}
-				}
-				if (locality > max) {
-					break;
 				}
 			}
 		}
@@ -330,7 +330,9 @@ function getCommoditiesPrice(commName, type,max) {
 
 		for (var commodity in ListOfCommodities) {
 			// ListOfCommodities[commodity]
-
+			if (commodity >= max) {
+				break;
+			}
 			if (message == '') {
 				message = computeMessage(locale.commodities_found, [ListOfCommodities[commodity]['name']])
 			}
@@ -340,9 +342,7 @@ function getCommoditiesPrice(commName, type,max) {
 			else
 				message = message + ' ' + computeMessage(locale.commodities_sell, [ListOfCommodities[commodity]['code'], ListOfCommodities[commodity]['localisation'], ListOfCommodities[commodity]['price'].toLocaleString('en-US')])
 			
-			if (commodity > max) {
-				break;
-			}
+
 		}
 	} else if (listCommodities.length < 10 && listCommodities.length > 0) {
 		message = computeMessage(locale.commodities_list, [listCommodities]);
