@@ -131,7 +131,11 @@ const client = new tmi.client(twitch_options);
 client.on('message', onMessageHandler);
 client.on('connected', onConnectedHandler);
 
-client.connect();
+client.connect()
+	.then(response => response.json())
+	.catch(err => alert(err)) // TypeError: failed to fetch (the text may vary)
+
+
 
 function computeMessage(message, table) {
 	var computedMessage = message;
