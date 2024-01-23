@@ -77,7 +77,7 @@ function refreshAPI() {
 					if (err)
 						console.log(err);
 					else
-						console.log("jsonShipData written successfully\n");
+						console.log("jsonShipData written successfully");
 				});
 			} else {
 				var rawShipdata = fs.readFileSync('jsonShipData.json');
@@ -91,7 +91,7 @@ function refreshAPI() {
 					if (err)
 						console.log(err);
 					else
-						console.log("jsonCommoditiesData written successfully\n");
+						console.log("jsonCommoditiesData written successfully");
 				});
 			} else {
 				var rawCommoditiesdata = fs.readFileSync('jsonCommoditiesData.json');
@@ -105,7 +105,7 @@ function refreshAPI() {
 					if (err)
 						console.log(err);
 					else
-						console.log("jsonTradeportsData written successfully\n");
+						console.log("jsonTradeportsData written successfully");
 				});
 			} else {
 				var rawTradeportsdata = fs.readFileSync('jsonTradeportsData.json');
