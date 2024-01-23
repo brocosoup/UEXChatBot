@@ -90,10 +90,6 @@ passport.use('twitch', new OAuth2Strategy({
     profile.display_name = profile.data[0].display_name;
     profile.bio = profile.data[0].description;
     profile.logo = profile.data[0].profile_image_url;
-    // Securely store user profile in your DB
-    //User.findOrCreate(..., function(err, user) {
-    //  done(err, user);
-    //});
     loggedinUser = profile;
     done(null, profile);
   }
