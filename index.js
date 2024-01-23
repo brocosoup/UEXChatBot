@@ -120,7 +120,7 @@ function refreshAPI() {
 
 // Connect to Twitch:
 // Create a client with our options
-const twitch_options = {
+var twitch_options = {
 	identity: {
 		'username': config.identity.username,
 		'password': config.identity.password
@@ -128,7 +128,7 @@ const twitch_options = {
 	channels: config.channels,
 };
 
-const client = new tmi.client(twitch_options)
+var client = new tmi.client(twitch_options)
 
 // Register our event handlers (defined below)
 client.on('message', onMessageHandler);
@@ -432,12 +432,13 @@ function refreshAuth()
 	const api_set = {
 		method: 'POST',
 		headers: {
-			'Content-Type': 'application/json',
+			'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
 		},
 		body: formBody
 	};
 
 	console.log('Time to refresh our oauth2 token')
+	console.log(api_set);
 	let api = [
 		'https://id.twitch.tv/oauth2/token'
 	];
@@ -453,6 +454,27 @@ function refreshAuth()
 				alert('Login authentication failed');
 			} else {
 				console.log(results[0])
+				config.identity.password = 'oauth:' + results[0].access_token;
+				config.refreshToken = results[0].refresh_token;
+				var twitch_options = {
+					identity: {
+						'username': config.identity.username,
+						'password': config.identity.password
+					},
+					channels: config.channels,
+				};
+				client.close();
+				console.log('Twitch Client closed');
+				client = new tmi.client(twitch_options);
+				client.on('message', onMessageHandler);
+				client.on('connected', onConnectedHandler);
+
+				checkAuth();
+
+				client.connect()
+					.catch(err => alert(err))
+				fs.writeFileSync("settings.json", JSON.stringify(config))
+				console.log('You need to reconnect!');
 			}
 		}).catch(function (err) {
 			console.log(err);
