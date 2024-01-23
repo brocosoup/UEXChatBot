@@ -375,7 +375,7 @@ function getCommoditiesPrice(commName, type, max) {
 }
 
 setInterval(checkAuth, 1000 * 60 * 60);
-setInterval(refreshAuth, 1000 * 60 * 1);
+setInterval(refreshAuth, 1000 * 60 * 60 * 3);
 
 function checkAuth()
 {
@@ -463,7 +463,8 @@ function refreshAuth()
 					},
 					channels: config.channels,
 				};
-				client.close();
+				fs.writeFileSync("settings.json", JSON.stringify(config))
+				client.disconnect();
 				console.log('Twitch Client closed');
 				client = new tmi.client(twitch_options);
 				client.on('message', onMessageHandler);
@@ -473,8 +474,7 @@ function refreshAuth()
 
 				client.connect()
 					.catch(err => alert(err))
-				fs.writeFileSync("settings.json", JSON.stringify(config))
-				console.log('You need to reconnect!');
+
 			}
 		}).catch(function (err) {
 			console.log(err);
