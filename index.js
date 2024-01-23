@@ -421,14 +421,6 @@ function refreshAuth()
 		'refresh_token': config.refreshToken
 	};
 
-	const api_set = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: formBody
-	};
-	
 	var formBody = [];
 	for (var property in details) {
 	  var encodedKey = encodeURIComponent(property);
@@ -436,6 +428,14 @@ function refreshAuth()
 	  formBody.push(encodedKey + "=" + encodedValue);
 	}
 	formBody = formBody.join("&");
+
+	const api_set = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: formBody
+	};
 
 	console.log('Time to refresh our oauth2 token')
 	let api = [
