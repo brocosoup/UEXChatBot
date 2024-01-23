@@ -10,6 +10,8 @@ function initJSONFile(file) {
 	}
 }
 
+var twitch_refresh_token;
+
 initJSONFile('locale');
 let rawlocale = fs.readFileSync('locale.json');
 const locale = await JSON.parse(rawlocale);
@@ -375,7 +377,6 @@ function getCommoditiesPrice(commName, type, max) {
 }
 
 setInterval(checkAuth, 1000 * 60 * 60);
-setInterval(refreshAuth, 1000 * 60 * 60 * 3);
 
 function checkAuth()
 {
@@ -401,7 +402,9 @@ function checkAuth()
 			{
 				alert('Login authentication failed');
 			} else {
-				console.log(results[0])
+				twitch_refresh_token = Math.round(results[0].expires_in) - 30;
+				console.log('I will refresh the token in ' + Math.round(twitch_refresh_token/60) + ' minutes');
+				setTimeout(refreshAuth, twitch_refresh_token * 1000);
 			}
 		}).catch(function (err) {
 			console.log(err);
@@ -438,7 +441,6 @@ function refreshAuth()
 	};
 
 	console.log('Time to refresh our oauth2 token')
-	console.log(api_set);
 	let api = [
 		'https://id.twitch.tv/oauth2/token'
 	];
@@ -453,7 +455,6 @@ function refreshAuth()
 			{
 				alert('Login authentication failed');
 			} else {
-				console.log(results[0])
 				config.identity.password = 'oauth:' + results[0].access_token;
 				config.refreshToken = results[0].refresh_token;
 				var twitch_options = {
