@@ -32,6 +32,7 @@ if (config.identity.password == undefined || config.identity.password == '' || (
 	server.close();
 }
 
+
 if (config.api_key == '') {
 	if (!fs.existsSync('jsonCommoditiesData.json') || !fs.existsSync('jsonShipData.json') || !fs.existsSync('jsonTradeportsData.json')) {
 		console.log('You have no api_key and no local files. I will now shutdown.');
@@ -125,18 +126,24 @@ const twitch_options = {
 	channels: config.channels,
 };
 
-const client = new tmi.client(twitch_options);
+const client = new tmi.client(twitch_options)
 
 // Register our event handlers (defined below)
 client.on('message', onMessageHandler);
 client.on('connected', onConnectedHandler);
 
 client.connect()
-	.catch(err => alert(err)) // TypeError: failed to fetch (the text may vary)
+	.catch(err => alert(err))
 
 function alert(err)
 {
-
+	if(err === 'Login authentication failed')
+	{
+		config.identity.username = '';
+		config.identity.password = '';
+		fs.writeFileSync("settings.json", JSON.stringify(config))
+		console.log('You need to reconnect!');
+	}
 }
 
 function computeMessage(message, table) {
