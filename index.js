@@ -26,6 +26,8 @@ if (config.identity.password == undefined || config.identity.password == '' || (
 	}
 	config.identity.username = profile.data[0].display_name.toLowerCase();
 	config.identity.password = 'oauth:' + profile.accessToken;
+	config.refreshToken = profile.refreshToken;
+	console.log(profile);
 	if (config.channels[0] === '')
 		config.channels = [profile.data[0].display_name.toLowerCase()];
 	fs.writeFileSync("settings.json", JSON.stringify(config))
@@ -132,6 +134,8 @@ const client = new tmi.client(twitch_options)
 client.on('message', onMessageHandler);
 client.on('connected', onConnectedHandler);
 
+checkAuth();
+
 client.connect()
 	.catch(err => alert(err))
 
@@ -143,6 +147,7 @@ function alert(err)
 		config.identity.password = '';
 		fs.writeFileSync("settings.json", JSON.stringify(config))
 		console.log('You need to reconnect!');
+		exit(7);
 	}
 }
 
@@ -369,6 +374,92 @@ function getCommoditiesPrice(commName, type, max) {
 	return message;
 }
 
+setInterval(checkAuth, 1000 * 60 * 60);
+setInterval(refreshAuth, 1000 * 60 * 1);
+
+function checkAuth()
+{
+	const api_set = {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': 'OAuth ' + config.identity.password.substr('oauth:'.length)
+		},
+	};
+	console.log('Time to check for our oauth2 token validity')
+	let api = [
+		'https://id.twitch.tv/oauth2/validate'
+	];
+	let requests = api.map(async function (url) {
+		const response = await fetch(url, api_set);
+		return await response.json();
+	});
+
+	Promise.all(requests)
+		.then((results) => {
+			if (results[0].status === 401)
+			{
+				alert('Login authentication failed');
+			} else {
+				console.log(results[0])
+			}
+		}).catch(function (err) {
+			console.log(err);
+			exit(5);
+		})
+
+}
+
+function refreshAuth()
+{
+	let ServerConfig = JSON.parse(fs.readFileSync('server.json'));
+	const details = {
+		'grant_type': 'refresh_token',
+		'client_id': ServerConfig.server.client,
+		'client_secret': ServerConfig.server.secret,
+		'access_token': config.identity.password.substr('oauth:'.length),
+		'refresh_token': config.refreshToken
+	};
+
+	const api_set = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: formBody
+	};
+	
+	var formBody = [];
+	for (var property in details) {
+	  var encodedKey = encodeURIComponent(property);
+	  var encodedValue = encodeURIComponent(details[property]);
+	  formBody.push(encodedKey + "=" + encodedValue);
+	}
+	formBody = formBody.join("&");
+
+	console.log('Time to refresh our oauth2 token')
+	let api = [
+		'https://id.twitch.tv/oauth2/token'
+	];
+	let requests = api.map(async function (url) {
+		const response = await fetch(url, api_set);
+		return await response.json();
+	});
+
+	Promise.all(requests)
+		.then((results) => {
+			if (results[0].status === 401)
+			{
+				alert('Login authentication failed');
+			} else {
+				console.log(results[0])
+			}
+		}).catch(function (err) {
+			console.log(err);
+			exit(5);
+		})
+
+}
 
 // Called every time a message comes in
 function onMessageHandler(target, context, msg, self) {
