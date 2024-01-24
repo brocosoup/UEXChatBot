@@ -17,6 +17,7 @@
 	"commodities_too_much": "J'ai trouvé trop de réponse correspondante",
 	"not_found": "Je n'ai rien trouvé",
 	"shipbuy_command": "achatship",
+	"tadd_command": "tu",
 	"shiprent_command": "louership",
 	"shipbuy_limit": 3,
 	"shiprent_limit": 3,

@@ -248,7 +248,7 @@ function onMessageHandler(target, context, msg, self) {
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
-			} else if (commandName.toLowerCase() == '!tadd' )
+			} else if (commandName.toLowerCase() == '!' + locale.tadd_command )
 			{
 				var res = addToDatabase(commandArgs);
 				if (res != undefined) {
