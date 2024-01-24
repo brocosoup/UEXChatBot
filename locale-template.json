@@ -17,7 +17,6 @@
 	"commodities_too_much": "J'ai trouvé trop de réponse correspondante",
 	"not_found": "Je n'ai rien trouvé",
 	"shipbuy_command": "achatship",
-	"tadd_command": "tu",
 	"shiprent_command": "louership",
 	"shipbuy_limit": 3,
 	"shiprent_limit": 3,
@@ -36,7 +35,8 @@
 	"trade_limit": 1,
 	"trade_usage": "C'est pas comme ça ! %%1 Neon",
 	"commodity_get_buy": "%%1 s'achète %%3 aUEC à %%2",
-	"commodity_set_buy": "%%1 s'achètese vend désormais %%3 aUEC à %%2",	
+	"commodity_set_buy": "%%1 s'achète désormais %%3 aUEC à %%2",	
 	"commodity_get_sell": "%%1 se vend %%3 aUEC à %%2",
-	"commodity_set_sell": "%%1 se vend désormais %%3 aUEC à %%2"
+	"commodity_set_sell": "%%1 se vend désormais %%3 aUEC à %%2",
+	"tadd_command": "tu"
 }
