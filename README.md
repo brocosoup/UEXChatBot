@@ -10,6 +10,7 @@ This project uses the following environment variables:
 
 # Pre-requisites
 - Install [Node.js](https://nodejs.org/en/) version >= 20.11.0 (also tested with 21.6.0)
+- Git client need to be installed (to get the repository and the updates)
 
 
 # Getting started
