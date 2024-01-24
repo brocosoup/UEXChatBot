@@ -262,8 +262,6 @@ function setCommoditiesPrice(commName, type, location,price) {
     const listCommodities = getListCommodities(commName);
     const listLoc = getListLocation(location);
     var message = '';
-    console.log(listLoc)
-    console.log(listCommodities)
     if (listCommodities.length == 1 && listLoc.length == 1) {
         for (var tradeport in jsonTradeportsData.data) {
             var found = false;
