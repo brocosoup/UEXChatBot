@@ -11,7 +11,7 @@ module.exports = {
 }
 
 function addToDatabase(ressource) {
-    return setCommoditiesPrice(ressource[0],ressource[1],ressource[2],ressource[3]);
+    return setCommoditiesPrice(ressource[0], ressource[1], ressource[2], ressource[3]);
 }
 
 var jsonShipData = {};
@@ -80,10 +80,11 @@ function refreshAPI(api_settings) {
 
 function computeMessage(message, table) {
     var computedMessage = message;
-    var argID = 1;
+    var argNum = 1;
+
     for (var arg in table) {
-        computedMessage = computedMessage.replace('%%' + argID, table[arg])
-        argID++;
+        computedMessage = computedMessage.replace('%%' + argNum, table[arg])
+        argNum++;
     }
     return computedMessage;
 }
@@ -105,12 +106,12 @@ function getListCommodities(commName) {
     let listCommodities = [];
     for (var commodID in jsonCommoditiesData.data) {
         if (commName == undefined) {
-            listCommodities.push([jsonCommoditiesData.data[commodID]['name'],jsonCommoditiesData.data[commodID]['code']]);
+            listCommodities.push({ name: jsonCommoditiesData.data[commodID]['name'], code: jsonCommoditiesData.data[commodID]['code'] });
         } else if (jsonCommoditiesData.data[commodID]['name'].toLowerCase() == commName.toLowerCase()) {
-            listCommodities = [[jsonCommoditiesData.data[commodID]['name']],jsonCommoditiesData.data[commodID]['code']];
+            listCommodities = [{ name: jsonCommoditiesData.data[commodID]['name'], code: jsonCommoditiesData.data[commodID]['code'] }];
             return listCommodities;
         } else if (jsonCommoditiesData.data[commodID]['name'].toLowerCase().includes(commName.toLowerCase())) {
-            listCommodities.push([jsonCommoditiesData.data[commodID]['name'],jsonCommoditiesData.data[commodID]['code']]);
+            listCommodities.push({ name: jsonCommoditiesData.data[commodID]['name'], code: jsonCommoditiesData.data[commodID]['code'] });
         }
     }
     return listCommodities;
@@ -210,7 +211,7 @@ function getCommoditiesPrice(commName, type, max) {
         var ListOfCommodities = [];
         for (var tradeport in jsonTradeportsData.data) {
             for (var commodity in jsonTradeportsData.data[tradeport]['prices']) {
-                if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'] != null && jsonTradeportsData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == listCommodities[0][0].toLowerCase() && jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] > 0) {
+                if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'] != null && jsonTradeportsData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == listCommodities[0].name.toLowerCase() && jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] > 0) {
                     var loc = jsonTradeportsData.data[tradeport]['planet']
                     if (jsonTradeportsData.data[tradeport]['satellite'] != null && jsonTradeportsData.data[tradeport]['satellite'] != '') {
                         loc = jsonTradeportsData.data[tradeport]['satellite']
@@ -218,9 +219,7 @@ function getCommoditiesPrice(commName, type, max) {
                     if (jsonTradeportsData.data[tradeport]['city'] != null && jsonTradeportsData.data[tradeport]['city'] != '') {
                         loc = jsonTradeportsData.data[tradeport]['city']
                     }
-
                     ListOfCommodities.push({ 'name': jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], 'tradeport': jsonTradeportsData.data[tradeport]['name'], 'code': jsonTradeportsData.data[tradeport]['name_short'], 'localisation': loc, 'price': jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] })
-
                 }
             }
         }
@@ -245,67 +244,97 @@ function getCommoditiesPrice(commName, type, max) {
 
 
         }
-    } else if (listCommodities.length < 10 && listCommodities.length > 0) {
-        message = computeMessage(locale.commodities_list, [listCommodities]);
+    } else if (listCommodities.length < 10 && listCommodities.length > 1) {
+        message = computeMessage(locale.commodities_list, [getListofName(listCommodities)]);
     } else if (listCommodities.length >= 10) {
-        message = computeMessage(locale.commodities_too_much, [listCommodities]);
+        message = computeMessage(locale.commodities_too_much, [getListofName(listCommodities)]);
     } else if (listCommodities.length == 0) {
-        message = computeMessage(locale.commodities_none, [listCommodities]);
-    }
-    if (message == '') {
-        message = computeMessage(locale.commodities_no_loc, [listCommodities, type]);
+        message = computeMessage(locale.commodities_none, [getListofName(listCommodities)]);
     }
     return message;
 }
 
-function setCommoditiesPrice(commName, type, location,price) {
+function getListofName(list) {
+    var res = ""
+    for (var id in list) {
+        if (res == '')
+            res = list[id].name
+        else
+            res = res + ',' + list[id].name
+    }
+    return res;
+}
+
+function setCommoditiesPrice(commName, type, location, price) {
     const listCommodities = getListCommodities(commName);
     const listLoc = getListLocation(location);
     var message = '';
+
+    if (listCommodities.length < 10 && listCommodities.length > 1) {
+        message = computeMessage(locale.commodities_list, [listCommodities[0]]);
+        return message;
+    } else if (listCommodities.length >= 10) {
+        message = computeMessage(locale.commodities_too_much, [listCommodities[0]]);
+        return message;
+    } else if (listCommodities.length == 0) {
+        message = computeMessage(locale.commodities_none, [listCommodities[0]]);
+        return message;
+    }
+
+    if (listLoc.length < 10 && listLoc.length > 1) {
+        message = computeMessage(locale.commodities_list, [listLoc]);
+        return message;
+    } else if (listLoc.length >= 10) {
+        message = computeMessage(locale.commodities_too_much, [listLoc]);
+        return message;
+    } else if (listLoc.length == 0) {
+        message = computeMessage(locale.commodities_none, [listLoc]);
+        return message;
+    }
+
     if (listCommodities.length == 1 && listLoc.length == 1) {
         for (var tradeport in jsonTradeportsData.data) {
             var found = false;
             if (jsonTradeportsData.data[tradeport]['name'] == listLoc[0]) {
                 for (var commodity in jsonTradeportsData.data[tradeport]['prices']) {
-                    if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == listCommodities[0][0].toLowerCase() && (type == 'buy' || type == 'sell')) {
-                        found=true;
-                        message = computeMessage(locale.commodity_get, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'],jsonTradeportsData.data[tradeport]['name'],jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
-                        if (price != undefined)
-                        {
-                            jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]=price;
-                            message = computeMessage(locale.commodity_set, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'],jsonTradeportsData.data[tradeport]['name'],jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
+                    if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == listCommodities[0].name.toLowerCase() && (type == 'buy' || type == 'sell')) {
+                        found = true;
+                        if (type == 'buy')
+                            message = computeMessage(locale.commodity_get_buy, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
+                        else (type == 'sell')
+                            message = computeMessage(locale.commodity_get_sell, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
+
+                        if (price != undefined) {
+                            jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] = price;
+                            if (type == 'buy')
+                                message = computeMessage(locale.commodity_set_buy, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], price]);
+                            else if (type == 'sell')
+                                message = computeMessage(locale.commodity_set_sell, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], price]);
+
                         }
-                        
+
                     }
                 }
-                if (found == false && type == 'buy')
-                {
+                if (found == false && type == 'buy') {
                     const res = {
-                        name: listCommodities[0][0],
-                        price_buy : price,
+                        name: listCommodities[0].name,
+                        price_buy: price,
                         price_sell: 0,
                     }
-                    jsonTradeportsData.data[tradeport]['prices'][commodity][listCommodities[0][1]] = res;
+                    jsonTradeportsData.data[tradeport]['prices'][commodity][listCommodities[0].code] = res;
+                    message = computeMessage(locale.commodity_set_buy, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], price]);
                 } else if (found == false && type == 'sell') {
                     const res = {
-                        name: listCommodities[0][0],
-                        price_buy : 0,
+                        name: listCommodities[0].name,
+                        price_buy: 0,
                         price_sell: price,
                     }
-                    
-                    jsonTradeportsData.data[tradeport].prices[listCommodities[0][1]] = res;
+
+                    jsonTradeportsData.data[tradeport].prices[listCommodities[0].name] = res;
+                    message = computeMessage(locale.commodity_set_sell, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], price]);
                 }
             }
         }
-    } else if (listCommodities.length < 10 && listCommodities.length > 0) {
-        message = computeMessage(locale.commodities_list, [listCommodities]);
-    } else if (listCommodities.length >= 10) {
-        message = computeMessage(locale.commodities_too_much, [listCommodities]);
-    } else if (listCommodities.length == 0) {
-        message = computeMessage(locale.commodities_none, [listCommodities]);
-    }
-    if (message == '') {
-        message = computeMessage(locale.commodities_no_loc, [listCommodities, type]);
     }
     return message;
 }
