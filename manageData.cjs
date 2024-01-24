@@ -272,7 +272,7 @@ function setCommoditiesPrice(commName, typeSet, location='', price) {
     const listCommodities = getListCommodities(commName.replace(/^ */g, '').replace(/ *$/g, ''));
     const listLoc = getListLocation(location.replace(/^ */g, '').replace(/ *$/g, ''));
     const type = typeSet.replace(/ /g, ''.replace(/^ */g, '').replace(/ *$/g, ''));
-    
+
     var message = '';
 
     if (listCommodities.length < 10 && listCommodities.length > 1) {
@@ -302,7 +302,7 @@ function setCommoditiesPrice(commName, typeSet, location='', price) {
             var found = false;
             if (jsonTradeportsData.data[tradeport]['name'] == listLoc[0]) {
                 for (var commodity in jsonTradeportsData.data[tradeport]['prices']) {
-                    if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == listCommodities[0].name.toLowerCase() && (type == 'buy' || type == 'sell')) {
+                    if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'] != null && jsonTradeportsData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == listCommodities[0].name.toLowerCase() && (type == 'buy' || type == 'sell')) {
                         found = true;
                         if (type == 'buy' && jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] > 0)
                             message = computeMessage(locale.commodity_get_buy, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
