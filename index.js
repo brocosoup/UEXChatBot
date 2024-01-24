@@ -263,7 +263,7 @@ function onMessageHandler(target, context, msg, self) {
 			} else if (commandName == '!' + locale.shipbuy_command) {
 				sendMe(target, computeMessage(locale.shipbuy_usage, [locale.shipbuy_command]));
 			} else if (commandName == '!' + locale.help_command) {
-				sendMe(target, computeMessage(locale.help_message, [locale.shiprent_command, locale.shipbuy_command, locale.infosell_command, locale.infobuy_command, locale.coucou_command, locale.trade_command]));
+				sendMe(target, computeMessage(locale.help_message, [locale.shiprent_command, locale.shipbuy_command, locale.infosell_command, locale.infobuy_command, locale.coucou_command, locale.trade_command, locale.tadd_command]));
 			} else if (commandName == '!' + locale.infosell_command) {
 				sendMe(target, computeMessage(locale.infosell_usage, [locale.infosell_command]));
 			} else if (commandName == '!' + locale.infobuy_command) {
