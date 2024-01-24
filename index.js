@@ -143,14 +143,11 @@ client.connect()
 
 function alert(err)
 {
-	if(err === 'Login authentication failed')
-	{
-		config.identity.username = '';
-		config.identity.password = '';
-		fs.writeFileSync("settings.json", JSON.stringify(config))
-		console.log('You need to reconnect!');
-		exit(7);
-	}
+	config.identity.username = '';
+	config.identity.password = '';
+	fs.writeFileSync("settings.json", JSON.stringify(config))
+	console.log(err);
+	exit(7);
 }
 
 function computeMessage(message, table) {
@@ -398,9 +395,12 @@ function checkAuth()
 
 	Promise.all(requests)
 		.then((results) => {
+			console.log(results);
 			if (results[0].status === 401)
 			{
-				alert('Login authentication failed');
+				client.disconnect();
+				refreshAuth();
+				//alert('Login authentication failed');
 			} else {
 				twitch_refresh_token = Math.round(results[0].expires_in) - 30;
 				console.log('I will refresh the token in ' + Math.round(twitch_refresh_token/60) + ' minutes');
@@ -451,9 +451,10 @@ function refreshAuth()
 
 	Promise.all(requests)
 		.then((results) => {
+			console.log(results);
 			if (results[0].status === 401)
 			{
-				alert('Login authentication failed');
+				alert('Refresh token failed');
 			} else {
 				config.identity.password = 'oauth:' + results[0].access_token;
 				config.refreshToken = results[0].refresh_token;
@@ -470,9 +471,6 @@ function refreshAuth()
 				client = new tmi.client(twitch_options);
 				client.on('message', onMessageHandler);
 				client.on('connected', onConnectedHandler);
-
-				checkAuth();
-
 				client.connect()
 					.catch(err => alert(err))
 
@@ -568,5 +566,5 @@ function sendMe(target, message, context) {
 
 // Called every time the bot connects to Twitch chat
 function onConnectedHandler(addr, port) {
-	console.log(`* Connected to ${addr}:${port}`);
+	console.log(`Connected to ${addr}:${port}`);
 }
