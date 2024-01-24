@@ -19,6 +19,7 @@ var handlebars = require('handlebars');
 var fs = require('fs');
 var https = require('https');
 var http = require('http');
+var logger = require('./logger.cjs');
 
 function initJSONFile(file)
 {
@@ -131,11 +132,11 @@ function runAuthServ() {
     
     var credentials = {key: privateKey, cert: certificate};
     server = https.createServer(credentials, app).listen(3000, function () {
-      console.log('Secure Authentication server listening on port 3000!')
+      logger.log('Secure Authentication server listening on port 3000!')
     });
   } else {
     server = app.listen(3000, function () {
-      console.log('Authentication server listening on port 3000!')
+      logger.log('Authentication server listening on port 3000!')
     });
   }
 }

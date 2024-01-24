@@ -3,6 +3,9 @@ import fetch from 'node-fetch';
 import fs from 'node:fs';
 import server from './server.cjs';
 import { exit } from 'node:process';
+import {log, setLogLevel} from './logger.cjs';
+
+setLogLevel(0); //0 for debug, 1 for warning, 2 for errors only
 
 function initJSONFile(file) {
 	if (!fs.existsSync(file + '.json')) {
@@ -21,7 +24,7 @@ var config = JSON.parse(fs.readFileSync("settings.json"));
 if (config.identity.password == undefined || config.identity.password == '' || (process.argv[2] && process.argv[2] === '-f')) {
 	let profile = []
 	server.runAuthServ();
-	console.log('Waiting for auth: go now to http://<hostname>:3000 to continue');
+	log('Waiting for auth: go now to http://<hostname>:3000 to continue');
 	while (profile == '') {
 		profile = server.getProfile()
 		await new Promise(r => setTimeout(r, 2000));
@@ -29,7 +32,7 @@ if (config.identity.password == undefined || config.identity.password == '' || (
 	config.identity.username = profile.data[0].display_name.toLowerCase();
 	config.identity.password = 'oauth:' + profile.accessToken;
 	config.refreshToken = profile.refreshToken;
-	console.log(profile);
+	log(profile);
 	if (config.channels[0] === '')
 		config.channels = [profile.data[0].display_name.toLowerCase()];
 	fs.writeFileSync("settings.json", JSON.stringify(config))
@@ -39,10 +42,10 @@ if (config.identity.password == undefined || config.identity.password == '' || (
 
 if (config.api_key == '') {
 	if (!fs.existsSync('jsonCommoditiesData.json') || !fs.existsSync('jsonShipData.json') || !fs.existsSync('jsonTradeportsData.json')) {
-		console.log('You have no api_key and no local files. I will now shutdown.');
+		log('You have no api_key and no local files. I will now shutdown.');
 		exit(2);
 	} else {
-		console.log('You UEX api_key is empty in settings.json, I will not update the data!');
+		log('You UEX api_key is empty in settings.json, I will not update the data!');
 	}
 }
 
@@ -77,45 +80,45 @@ function refreshAPI() {
 			if (jsonShipData['code'] == 200) {
 				fs.writeFile("jsonShipData.json", JSON.stringify(jsonShipData), (err) => {
 					if (err)
-						console.log(err);
+						log(err);
 					else
-						console.log("jsonShipData written successfully");
+						log("jsonShipData written successfully");
 				});
 			} else {
 				var rawShipdata = fs.readFileSync('jsonShipData.json');
 				jsonShipData = JSON.parse(rawShipdata);
-				console.log('Using local data for jsonShipData');
+				log('Using local data for jsonShipData');
 			}
 
 			jsonCommoditiesData = results[2];
 			if (jsonCommoditiesData['code'] == 200) {
 				fs.writeFile("jsonCommoditiesData.json", JSON.stringify(jsonCommoditiesData), (err) => {
 					if (err)
-						console.log(err);
+						log(err);
 					else
-						console.log("jsonCommoditiesData written successfully");
+						log("jsonCommoditiesData written successfully");
 				});
 			} else {
 				var rawCommoditiesdata = fs.readFileSync('jsonCommoditiesData.json');
 				jsonCommoditiesData = JSON.parse(rawCommoditiesdata);
-				console.log('Using local data for jsonCommoditiesData');
+				log('Using local data for jsonCommoditiesData');
 			}
 
 			jsonTradeportsData = results[1];
 			if (jsonTradeportsData['code'] == 200) {
 				fs.writeFile("jsonTradeportsData.json", JSON.stringify(jsonTradeportsData), (err) => {
 					if (err)
-						console.log(err);
+						log(err);
 					else
-						console.log("jsonTradeportsData written successfully");
+						log("jsonTradeportsData written successfully");
 				});
 			} else {
 				var rawTradeportsdata = fs.readFileSync('jsonTradeportsData.json');
 				jsonTradeportsData = JSON.parse(rawTradeportsdata);
-				console.log('Using local data for jsonTradeportsData');
+				log('Using local data for jsonTradeportsData');
 			}
 		}).catch(function (err) {
-			console.log(err);
+			log(err);
 		})
 
 }
@@ -146,7 +149,7 @@ function alert(err)
 	config.identity.username = '';
 	config.identity.password = '';
 	fs.writeFileSync("settings.json", JSON.stringify(config))
-	console.log(err);
+	log(err);
 	exit(7);
 }
 
@@ -154,9 +157,9 @@ function computeMessage(message, table) {
 	var computedMessage = message;
 	var argID = 1;
 	for (var arg in table) {
-		// console.log(table[arg]);
+		// log(table[arg]);
 		computedMessage = computedMessage.replace('%%' + argID, table[arg])
-		// console.log(computedMessage);
+		// log(computedMessage);
 		argID++;
 	}
 	return computedMessage;
@@ -194,7 +197,7 @@ function getShipPrice(shipName, type, max) {
 	if (listShips.length == 1) {
 		var ListOfShipsLocs = [];
 		var nbLocs = getNbLoc(listShips[0], type);
-		// console.log('Looking for \'' + listShips[0] + '\' and found ' + nbLocs + ' locations');
+		// log('Looking for \'' + listShips[0] + '\' and found ' + nbLocs + ' locations');
 		var message = '';
 		if (nbLocs == 0) {
 			// var message = 'Le ' + listShips[0] + ' n\'est pas disponible à l\'achat en jeu.';
@@ -206,9 +209,9 @@ function getShipPrice(shipName, type, max) {
 			for (var ship in jsonShipData.data) {
 				var locID = 1;
 				if (jsonShipData.data[ship]['name'].toLowerCase() == listShips[0].toLowerCase()) {
-					// console.log('Found ship \'' + listShips[0] + '\'');
+					// log('Found ship \'' + listShips[0] + '\'');
 					for (var loc in jsonShipData.data[ship][type + '_at']) {
-						// console.log(nbLocs + '/' + locID);
+						// log(nbLocs + '/' + locID);
 						var apiShipName = jsonShipData.data[ship]['name'];
 						var locSystemName = jsonShipData.data[ship][type + '_at'][loc]['system_name'];
 						var locCityName = jsonShipData.data[ship][type + '_at'][loc]['city_name'];
@@ -223,7 +226,7 @@ function getShipPrice(shipName, type, max) {
 
 						//apiShipName, locSystemName, locCityName, locStoreName, apiShipPrice, type
 						ListOfShipsLocs.push({ 'apiShipName': apiShipName, 'locSystemName': locSystemName, 'locCityName': locCityName, 'locStoreName': locStoreName, 'apiShipPrice': apiShipPrice, 'type': type })
-						// console.log(message);
+						// log(message);
 					}
 
 				}
@@ -373,8 +376,18 @@ function getCommoditiesPrice(commName, type, max) {
 	return message;
 }
 
-setInterval(checkAuth, 1000 * 60 * 60);
 
+setInterval(checkAuth, 1000 * 60 * 10);
+log('I will check for oauth validity every 10 minutes');
+
+var listTimeout = [];
+function clearRefreshs()
+{
+	for (var timeout in listTimeout)
+	{
+		clearTimeout(listTimeout[timeout]);
+	}
+}
 function checkAuth()
 {
 	const api_set = {
@@ -384,7 +397,7 @@ function checkAuth()
 			'Authorization': 'OAuth ' + config.identity.password.substr('oauth:'.length)
 		},
 	};
-	console.log('Time to check for our oauth2 token validity')
+	log('Time to check for our oauth2 token validity')
 	let api = [
 		'https://id.twitch.tv/oauth2/validate'
 	];
@@ -399,15 +412,17 @@ function checkAuth()
 			if (results[0].status === 401)
 			{
 				client.disconnect();
+				clearRefreshs();
 				refreshAuth();
 				//alert('Login authentication failed');
 			} else {
 				twitch_refresh_token = Math.round(results[0].expires_in) - 30;
-				console.log('I will refresh the token in ' + Math.round(twitch_refresh_token/60) + ' minutes');
-				setTimeout(refreshAuth, twitch_refresh_token * 1000);
+				log('I will refresh the token in ' + Math.round(twitch_refresh_token/60) + ' minutes');
+				clearRefreshs();
+				listTimeout.push(setTimeout(refreshAuth, twitch_refresh_token * 1000));
 			}
 		}).catch(function (err) {
-			console.log(err);
+			log(err);
 			exit(5);
 		})
 
@@ -440,7 +455,7 @@ function refreshAuth()
 		body: formBody
 	};
 
-	console.log('Time to refresh our oauth2 token')
+	log('Time to refresh our oauth2 token')
 	let api = [
 		'https://id.twitch.tv/oauth2/token'
 	];
@@ -467,7 +482,7 @@ function refreshAuth()
 				};
 				fs.writeFileSync("settings.json", JSON.stringify(config))
 				client.disconnect();
-				console.log('Twitch Client closed');
+				log('Twitch Client closed');
 				client = new tmi.client(twitch_options);
 				client.on('message', onMessageHandler);
 				client.on('connected', onConnectedHandler);
@@ -476,7 +491,7 @@ function refreshAuth()
 
 			}
 		}).catch(function (err) {
-			console.log(err);
+			log(err);
 			exit(5);
 		})
 
@@ -488,7 +503,7 @@ function onMessageHandler(target, context, msg, self) {
 
 	if (msg.substr(0, 1) == '!') // Do we have a command ?
 	{
-		console.log(target + ': @' + context.username + ': ' + msg);
+		log(target + ': @' + context.username + ': ' + msg);
 		const posDelim = msg.indexOf(' ');
 		if (posDelim != -1) {
 			const commandName = msg.substr(0, posDelim).trim();
@@ -566,5 +581,5 @@ function sendMe(target, message, context) {
 
 // Called every time the bot connects to Twitch chat
 function onConnectedHandler(addr, port) {
-	console.log(`Connected to ${addr}:${port}`);
+	log(`Connected to ${addr}:${port}`);
 }
