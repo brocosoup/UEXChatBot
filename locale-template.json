@@ -15,7 +15,7 @@
 	"commodities_list": "Vous devez être plus précis : %%1",
 	"commodities_no_loc": "Aucun emplacement de trade(%%2) trouvé pour %%1 ",
 	"commodities_too_much": "J'ai trouvé trop de réponse correspondante",
-	"commodities_none": "Kappa Je n'ai trouvé aucune réponse correspondante Kappa",
+	"not_found": "Je n'ai rien trouvé",
 	"shipbuy_command": "achatship",
 	"shiprent_command": "louership",
 	"shipbuy_limit": 3,
@@ -34,8 +34,8 @@
 	"trade_command": "trade",
 	"trade_limit": 1,
 	"trade_usage": "C'est pas comme ça ! %%1 Neon",
-	"commodity_get_buy": "%%1 se vend %%3 aUEC à %%2",
-	"commodity_set_buy": "%%1 se vend désormais %%3 aUEC à %%2",	
-	"commodity_get_sell": "%%1 s'achète %%3 aUEC à %%2",
-	"commodity_set_sell": "%%1 s'achète désormais %%3 aUEC à %%2"
+	"commodity_get_buy": "%%1 s'achète %%3 aUEC à %%2",
+	"commodity_set_buy": "%%1 s'achètese vend désormais %%3 aUEC à %%2",	
+	"commodity_get_sell": "%%1 se vend %%3 aUEC à %%2",
+	"commodity_set_sell": "%%1 se vend désormais %%3 aUEC à %%2"
 }

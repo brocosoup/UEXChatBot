@@ -11,7 +11,10 @@ module.exports = {
 }
 
 function addToDatabase(ressource) {
-    return setCommoditiesPrice(ressource[0], ressource[1], ressource[2], ressource[3]);
+    if (ressource.length >= 3 && ressource.length <=4)
+        return setCommoditiesPrice(ressource[0], ressource[1], ressource[2], ressource[3]);
+    else
+        return undefined;
 }
 
 var jsonShipData = {};
@@ -249,7 +252,7 @@ function getCommoditiesPrice(commName, type, max) {
     } else if (listCommodities.length >= 10) {
         message = computeMessage(locale.commodities_too_much, [getListofName(listCommodities)]);
     } else if (listCommodities.length == 0) {
-        message = computeMessage(locale.commodities_none, [getListofName(listCommodities)]);
+        message = computeMessage(locale.not_found, [getListofName(listCommodities)]);
     }
     return message;
 }
@@ -265,19 +268,21 @@ function getListofName(list) {
     return res;
 }
 
-function setCommoditiesPrice(commName, type, location, price) {
-    const listCommodities = getListCommodities(commName);
-    const listLoc = getListLocation(location);
+function setCommoditiesPrice(commName, typeSet, location='', price) {
+    const listCommodities = getListCommodities(commName.replace(/^ */g, '').replace(/ *$/g, ''));
+    const listLoc = getListLocation(location.replace(/^ */g, '').replace(/ *$/g, ''));
+    const type = typeSet.replace(/ /g, ''.replace(/^ */g, '').replace(/ *$/g, ''));
+    
     var message = '';
 
     if (listCommodities.length < 10 && listCommodities.length > 1) {
-        message = computeMessage(locale.commodities_list, [listCommodities[0]]);
+        message = computeMessage(locale.commodities_list, [getListofName(listCommodities)]);
         return message;
     } else if (listCommodities.length >= 10) {
-        message = computeMessage(locale.commodities_too_much, [listCommodities[0]]);
+        message = computeMessage(locale.commodities_too_much, [getListofName(listCommodities)]);
         return message;
     } else if (listCommodities.length == 0) {
-        message = computeMessage(locale.commodities_none, [listCommodities[0]]);
+        message = computeMessage(locale.not_found, [getListofName(listCommodities)]);
         return message;
     }
 
@@ -288,7 +293,7 @@ function setCommoditiesPrice(commName, type, location, price) {
         message = computeMessage(locale.commodities_too_much, [listLoc]);
         return message;
     } else if (listLoc.length == 0) {
-        message = computeMessage(locale.commodities_none, [listLoc]);
+        message = computeMessage(locale.not_found, [listLoc]);
         return message;
     }
 
@@ -303,39 +308,41 @@ function setCommoditiesPrice(commName, type, location, price) {
                             message = computeMessage(locale.commodity_get_buy, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
                         else if (type == 'sell' && jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] > 0)
                             message = computeMessage(locale.commodity_get_sell, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
-                        else
-                            message = computeMessage(locale.commodities_none, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
-                        if (price != undefined) {
+
+                        if (price != undefined && price != '') {
                             jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] = price;
                             if (type == 'buy')
                                 message = computeMessage(locale.commodity_set_buy, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], price]);
                             else if (type == 'sell')
                                 message = computeMessage(locale.commodity_set_sell, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], price]);
-
                         }
 
                     }
                 }
-                if (found == false && type == 'buy') {
+                if (found == false && type == 'buy' && price != undefined && price != '') {
                     const res = {
                         name: listCommodities[0].name,
                         price_buy: price,
                         price_sell: 0,
                     }
-                    jsonTradeportsData.data[tradeport]['prices'][commodity][listCommodities[0].code] = res;
-                    message = computeMessage(locale.commodity_set_buy, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], price]);
-                } else if (found == false && type == 'sell') {
+                    jsonTradeportsData.data[tradeport]['prices'][listCommodities[0].code] = res;
+                    message = computeMessage(locale.commodity_set_buy, [listCommodities[0].name, jsonTradeportsData.data[tradeport]['name'], price]);
+                } else if (found == false && type == 'sell' && price != undefined && price != '') {
                     const res = {
                         name: listCommodities[0].name,
                         price_buy: 0,
                         price_sell: price,
                     }
-
-                    jsonTradeportsData.data[tradeport].prices[listCommodities[0].name] = res;
-                    message = computeMessage(locale.commodity_set_sell, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], price]);
+                    jsonTradeportsData.data[tradeport]['prices'][listCommodities[0].code] = res;
+                    message = computeMessage(locale.commodity_set_sell, [listCommodities[0].name, jsonTradeportsData.data[tradeport]['name'], price]);
                 }
+                break;
             }
         }
+    }
+    if (message== '' )
+    {
+        message = computeMessage(locale.not_found, []);
     }
     return message;
 }
