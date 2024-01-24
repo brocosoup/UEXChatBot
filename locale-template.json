@@ -33,5 +33,7 @@
 	"coucou_message": "Hé! Coucou toi ! Je suis ici, tu peux afficher mes commandes avec !%%1",
 	"trade_command": "trade",
 	"trade_limit": 1,
-	"trade_usage": "C'est pas comme ça ! %%1 Neon"
+	"trade_usage": "C'est pas comme ça ! %%1 Neon",
+	"commodity_get": "Price of %%1 at %%2 is %%3 aEUC",
+	"commodity_set": "Price of %%1 at %%2 is set to %%3 aEUC"
 }

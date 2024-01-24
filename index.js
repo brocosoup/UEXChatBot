@@ -4,8 +4,9 @@ import fs from 'node:fs';
 import server from './server.cjs';
 import { exit } from 'node:process';
 import {log, setLogLevel} from './logger.cjs';
+import { addToDatabase,refreshAPI,getShipPrice,getCommoditiesPrice,setLocale } from './manageData.cjs';
 
-setLogLevel(0); //0 for debug, 1 for warning, 2 for errors only
+setLogLevel(-1); //-1 for debug, 0 for info, 1 for warning, 2 for errors only
 
 function initJSONFile(file) {
 	if (!fs.existsSync(file + '.json')) {
@@ -18,13 +19,14 @@ var twitch_refresh_token;
 initJSONFile('locale');
 let rawlocale = fs.readFileSync('locale.json');
 const locale = await JSON.parse(rawlocale);
+setLocale(locale);
 
 initJSONFile('settings');
 var config = JSON.parse(fs.readFileSync("settings.json"));
 if (config.identity.password == undefined || config.identity.password == '' || (process.argv[2] && process.argv[2] === '-f')) {
 	let profile = []
 	server.runAuthServ();
-	log('Waiting for auth: go now to http://<hostname>:3000 to continue');
+	log('Waiting for authentication. Connect to the webserver now',0);
 	while (profile == '') {
 		profile = server.getProfile()
 		await new Promise(r => setTimeout(r, 2000));
@@ -32,7 +34,6 @@ if (config.identity.password == undefined || config.identity.password == '' || (
 	config.identity.username = profile.data[0].display_name.toLowerCase();
 	config.identity.password = 'oauth:' + profile.accessToken;
 	config.refreshToken = profile.refreshToken;
-	log(profile);
 	if (config.channels[0] === '')
 		config.channels = [profile.data[0].display_name.toLowerCase()];
 	fs.writeFileSync("settings.json", JSON.stringify(config))
@@ -42,10 +43,10 @@ if (config.identity.password == undefined || config.identity.password == '' || (
 
 if (config.api_key == '') {
 	if (!fs.existsSync('jsonCommoditiesData.json') || !fs.existsSync('jsonShipData.json') || !fs.existsSync('jsonTradeportsData.json')) {
-		log('You have no api_key and no local files. I will now shutdown.');
+		log('You have no api_key and no local files. I will now shutdown.',2);
 		exit(2);
 	} else {
-		log('You UEX api_key is empty in settings.json, I will not update the data!');
+		log('You UEX api_key is empty in settings.json, I will not update the data!',1);
 	}
 }
 
@@ -57,71 +58,7 @@ const api_settings = {
 	},
 };
 
-var jsonShipData = {};
-var jsonCommoditiesData = {};
-var jsonTradeportsData = {};
-
-refreshAPI();
-
-function refreshAPI() {
-	let apicalls = [
-		'https://portal.uexcorp.space/api/ships/',
-		'https://portal.uexcorp.space/api/tradeports/system/ST/',
-		'https://portal.uexcorp.space/api/commodities/'
-	];
-	let requests = apicalls.map(async function (url) {
-		const response = await fetch(url, api_settings);
-		return await response.json();
-	});
-
-	Promise.all(requests)
-		.then((results) => {
-			jsonShipData = results[0];
-			if (jsonShipData['code'] == 200) {
-				fs.writeFile("jsonShipData.json", JSON.stringify(jsonShipData), (err) => {
-					if (err)
-						log(err);
-					else
-						log("jsonShipData written successfully");
-				});
-			} else {
-				var rawShipdata = fs.readFileSync('jsonShipData.json');
-				jsonShipData = JSON.parse(rawShipdata);
-				log('Using local data for jsonShipData');
-			}
-
-			jsonCommoditiesData = results[2];
-			if (jsonCommoditiesData['code'] == 200) {
-				fs.writeFile("jsonCommoditiesData.json", JSON.stringify(jsonCommoditiesData), (err) => {
-					if (err)
-						log(err);
-					else
-						log("jsonCommoditiesData written successfully");
-				});
-			} else {
-				var rawCommoditiesdata = fs.readFileSync('jsonCommoditiesData.json');
-				jsonCommoditiesData = JSON.parse(rawCommoditiesdata);
-				log('Using local data for jsonCommoditiesData');
-			}
-
-			jsonTradeportsData = results[1];
-			if (jsonTradeportsData['code'] == 200) {
-				fs.writeFile("jsonTradeportsData.json", JSON.stringify(jsonTradeportsData), (err) => {
-					if (err)
-						log(err);
-					else
-						log("jsonTradeportsData written successfully");
-				});
-			} else {
-				var rawTradeportsdata = fs.readFileSync('jsonTradeportsData.json');
-				jsonTradeportsData = JSON.parse(rawTradeportsdata);
-				log('Using local data for jsonTradeportsData');
-			}
-		}).catch(function (err) {
-			log(err);
-		})
-
-}
+refreshAPI(api_settings);
 
 // Connect to Twitch:
 // Create a client with our options
@@ -149,236 +86,12 @@ function alert(err)
 	config.identity.username = '';
 	config.identity.password = '';
 	fs.writeFileSync("settings.json", JSON.stringify(config))
-	log(err);
+	log(err,2);
 	exit(7);
 }
 
-function computeMessage(message, table) {
-	var computedMessage = message;
-	var argID = 1;
-	for (var arg in table) {
-		// log(table[arg]);
-		computedMessage = computedMessage.replace('%%' + argID, table[arg])
-		// log(computedMessage);
-		argID++;
-	}
-	return computedMessage;
-}
-
-function getShipList(shipName) {
-	var shipsList = []
-	for (var ship in jsonShipData.data) {
-		if (jsonShipData.data[ship]['name'].toLowerCase() == shipName.toLowerCase()) {
-			shipsList.push(jsonShipData.data[ship]['name']);
-			return shipsList; //we have a match, we can exit right now!
-		} else if (jsonShipData.data[ship]['name'].toLowerCase().includes(shipName.toLowerCase())) {
-			shipsList.push(jsonShipData.data[ship]['name']);
-		}
-	}
-	return shipsList;
-}
-
-function getNbLoc(shipName, type) {
-	var nbLocs = 0
-	for (var ship in jsonShipData.data) {
-		for (var loc in jsonShipData.data[ship][type + '_at']) {
-			if (jsonShipData.data[ship]['name'].toLowerCase() == shipName.toLowerCase()) {
-				nbLocs = nbLocs + 1
-			}
-		}
-	}
-	return nbLocs;
-}
-
-function getShipPrice(shipName, type, max) {
-	var listShips = getShipList(shipName);
-	var nbShips = listShips.length;
-	var message = '';
-	if (listShips.length == 1) {
-		var ListOfShipsLocs = [];
-		var nbLocs = getNbLoc(listShips[0], type);
-		// log('Looking for \'' + listShips[0] + '\' and found ' + nbLocs + ' locations');
-		var message = '';
-		if (nbLocs == 0) {
-			// var message = 'Le ' + listShips[0] + ' n\'est pas disponible à l\'achat en jeu.';
-			if (type == 'buy')
-				var message = computeMessage(locale.ship_not_available_buy, [listShips[0]]);
-			else if (type == 'rent')
-				var message = computeMessage(locale.ship_not_available_rent, [listShips[0]]);
-		} else {
-			for (var ship in jsonShipData.data) {
-				var locID = 1;
-				if (jsonShipData.data[ship]['name'].toLowerCase() == listShips[0].toLowerCase()) {
-					// log('Found ship \'' + listShips[0] + '\'');
-					for (var loc in jsonShipData.data[ship][type + '_at']) {
-						// log(nbLocs + '/' + locID);
-						var apiShipName = jsonShipData.data[ship]['name'];
-						var locSystemName = jsonShipData.data[ship][type + '_at'][loc]['system_name'];
-						var locCityName = jsonShipData.data[ship][type + '_at'][loc]['city_name'];
-						if (locCityName == undefined)
-							locCityName = jsonShipData.data[ship][type + '_at'][loc]['tradeport'];
-						if (locCityName == undefined)
-							locCityName = jsonShipData.data[ship][type + '_at'][loc]['planet_name'];
-						var locStoreName = '(' + jsonShipData.data[ship][type + '_at'][loc]['store_name'] + ')';
-						if (locStoreName == '(null)')
-							locStoreName = '';
-						var apiShipPrice = jsonShipData.data[ship][type + '_at'][loc]['price'].toLocaleString('en-US')
-
-						//apiShipName, locSystemName, locCityName, locStoreName, apiShipPrice, type
-						ListOfShipsLocs.push({ 'apiShipName': apiShipName, 'locSystemName': locSystemName, 'locCityName': locCityName, 'locStoreName': locStoreName, 'apiShipPrice': apiShipPrice, 'type': type })
-						// log(message);
-					}
-
-				}
-			}
-			ListOfShipsLocs.sort(compareShipByPriceDesc);
-			var limit = 0;
-			for (var locality in ListOfShipsLocs) {
-				if (locality >= max) {
-					break;
-				}
-				if (ListOfShipsLocs.length == 1) {
-
-					// message = '(' + type + ') Le ' + apiShipName + ' est à ' + locSystemName + ' ' + locCityName + ' ' + locStoreName + ' au prix de ' + apiShipPrice;
-					message = computeMessage(locale.ship_available_oneloc, [ListOfShipsLocs[locality].apiShipName, ListOfShipsLocs[locality].locSystemName, ListOfShipsLocs[locality].locCityName, ListOfShipsLocs[locality].locStoreName, ListOfShipsLocs[locality].apiShipPrice, ListOfShipsLocs[locality].type]);
-				}
-				else if (ListOfShipsLocs.length > 1) {
-					if (locality == 0) {
-						message = computeMessage(locale.ship_available_firstloc, [ListOfShipsLocs[locality].apiShipName, ListOfShipsLocs[locality].locSystemName, ListOfShipsLocs[locality].locCityName, ListOfShipsLocs[locality].locStoreName, ListOfShipsLocs[locality].apiShipPrice, ListOfShipsLocs[locality].type]);
-					} else if (locality + 1 == ListOfShipsLocs.length) {
-						message = message + computeMessage(locale.ship_available_lastloc, [ListOfShipsLocs[locality].apiShipName, ListOfShipsLocs[locality].locSystemName, ListOfShipsLocs[locality].locCityName, ListOfShipsLocs[locality].locStoreName, ListOfShipsLocs[locality].apiShipPrice, ListOfShipsLocs[locality].type]);
-					} else {
-						message = message + computeMessage(locale.ship_available_nextloc, [ListOfShipsLocs[locality].apiShipName, ListOfShipsLocs[locality].locSystemName, ListOfShipsLocs[locality].locCityName, ListOfShipsLocs[locality].locStoreName, ListOfShipsLocs[locality].apiShipPrice, ListOfShipsLocs[locality].type]);
-					}
-				}
-			}
-		}
-	} else if (listShips.length > 1 && listShips.length < 10) {
-		// message = 'Désolé, vous devez sélectionner un seul ship ' + listShips;
-		message = computeMessage(locale.ship_only_one, [listShips]);
-	} else if (listShips.length >= 10) {
-		// message = 'Désolé, j\'ai trouvé trop de ships correspondant à ce nom (' + listShips.length + ')';
-		message = computeMessage(locale.ship_too_much, [listShips.length]);
-	} else {
-		// message = 'Désolé, je n\'ai trouvé aucun ship correspondant à ce nom. Je ne saurais que vous conseiller d\'acheter un Carrack!';
-		message = computeMessage(locale.ship_no_ship, []);
-	}
-	return message
-}
-
-function compareComByPriceDesc(a, b) {
-
-	if (a.price < b.price) {
-		return -1;
-	}
-	if (a.price > b.price) {
-		return 1;
-	}
-	return 0;
-}
-function compareComByPriceAsc(a, b) {
-
-	if (a.price < b.price) {
-		return 1;
-	}
-	if (a.price > b.price) {
-		return -1;
-	}
-	return 0;
-}
-
-function compareShipByPriceDesc(a, b) {
-
-	if (a.apiShipPrice < b.apiShipPrice) {
-		return -1;
-	}
-	if (a.apiShipPrice > b.apiShipPrice) {
-		return 1;
-	}
-	return 0;
-}
-function compareShipByPriceAsc(a, b) {
-
-	if (a.apiShipPrice < b.apiShipPrice) {
-		return 1;
-	}
-	if (a.apiShipPrice > b.apiShipPrice) {
-		return -1;
-	}
-	return 0;
-}
-
-function getListCommodities(commName) {
-	let listCommodities = [];
-	for (var commodID in jsonCommoditiesData.data) {
-		if (jsonCommoditiesData.data[commodID]['name'].toLowerCase() == commName.toLowerCase()) {
-			listCommodities = [jsonCommoditiesData.data[commodID]['name']];
-			return listCommodities;
-		} else if (jsonCommoditiesData.data[commodID]['name'].toLowerCase().includes(commName.toLowerCase())) {
-			listCommodities.push(jsonCommoditiesData.data[commodID]['name']);
-		}
-	}
-	return listCommodities;
-}
-
-function getCommoditiesPrice(commName, type, max) {
-	const listCommodities = getListCommodities(commName)
-	var message = ''
-	if (listCommodities.length == 1) {
-		var ListOfCommodities = [];
-		for (var tradeport in jsonTradeportsData.data) {
-			for (var commodity in jsonTradeportsData.data[tradeport]['prices']) {
-				if (jsonTradeportsData.data[tradeport]['prices'][commodity]['name'] != null && jsonTradeportsData.data[tradeport]['prices'][commodity]['name'].toLowerCase() == listCommodities[0].toLowerCase() && jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] > 0) {
-					var loc = jsonTradeportsData.data[tradeport]['planet']
-					if (jsonTradeportsData.data[tradeport]['satellite'] != null && jsonTradeportsData.data[tradeport]['satellite'] != '') {
-						loc = jsonTradeportsData.data[tradeport]['satellite']
-					}
-					if (jsonTradeportsData.data[tradeport]['city'] != null && jsonTradeportsData.data[tradeport]['city'] != '') {
-						loc = jsonTradeportsData.data[tradeport]['city']
-					}
-
-					ListOfCommodities.push({ 'name': jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], 'tradeport': jsonTradeportsData.data[tradeport]['name'], 'code': jsonTradeportsData.data[tradeport]['name_short'], 'localisation': loc, 'price': jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] })
-
-				}
-			}
-		}
-		if (type == 'buy')
-			ListOfCommodities.sort(compareComByPriceDesc);
-		else if (type == 'sell')
-			ListOfCommodities.sort(compareComByPriceAsc);
-
-		for (var commodity in ListOfCommodities) {
-			// ListOfCommodities[commodity]
-			if (commodity >= max) {
-				break;
-			}
-			if (message == '') {
-				message = computeMessage(locale.commodities_found, [ListOfCommodities[commodity]['name']])
-			}
-
-			if (type == 'buy')
-				message = message + ' ' + computeMessage(locale.commodities_buy, [ListOfCommodities[commodity]['code'], ListOfCommodities[commodity]['localisation'], ListOfCommodities[commodity]['price'].toLocaleString('en-US')])
-			else
-				message = message + ' ' + computeMessage(locale.commodities_sell, [ListOfCommodities[commodity]['code'], ListOfCommodities[commodity]['localisation'], ListOfCommodities[commodity]['price'].toLocaleString('en-US')])
-
-
-		}
-	} else if (listCommodities.length < 10 && listCommodities.length > 0) {
-		message = computeMessage(locale.commodities_list, [listCommodities]);
-	} else if (listCommodities.length >= 10) {
-		message = computeMessage(locale.commodities_too_much, [listCommodities]);
-	} else if (listCommodities.length == 0) {
-		message = computeMessage(locale.commodities_none, [listCommodities]);
-	}
-	if (message == '') {
-		message = computeMessage(locale.commodities_no_loc, [listCommodities, type]);
-	}
-	return message;
-}
-
-
 setInterval(checkAuth, 1000 * 60 * 10);
-log('I will check for oauth validity every 10 minutes');
+log('Checking for oauth validity every 10 minutes',1);
 
 var listTimeout = [];
 function clearRefreshs()
@@ -397,7 +110,7 @@ function checkAuth()
 			'Authorization': 'OAuth ' + config.identity.password.substr('oauth:'.length)
 		},
 	};
-	log('Time to check for our oauth2 token validity')
+	log('Checking for our oauth2 token validity',-1)
 	let api = [
 		'https://id.twitch.tv/oauth2/validate'
 	];
@@ -408,7 +121,6 @@ function checkAuth()
 
 	Promise.all(requests)
 		.then((results) => {
-			console.log(results);
 			if (results[0].status === 401)
 			{
 				client.disconnect();
@@ -417,12 +129,12 @@ function checkAuth()
 				//alert('Login authentication failed');
 			} else {
 				twitch_refresh_token = Math.round(results[0].expires_in) - 30;
-				log('I will refresh the token in ' + Math.round(twitch_refresh_token/60) + ' minutes');
+				log('I will refresh the token in ' + Math.round(twitch_refresh_token/60) + ' minutes',-1);
 				clearRefreshs();
 				listTimeout.push(setTimeout(refreshAuth, twitch_refresh_token * 1000));
 			}
 		}).catch(function (err) {
-			log(err);
+			log(err,2);
 			exit(5);
 		})
 
@@ -455,7 +167,7 @@ function refreshAuth()
 		body: formBody
 	};
 
-	log('Time to refresh our oauth2 token')
+	log('Refreshing our oauth2 token',-1)
 	let api = [
 		'https://id.twitch.tv/oauth2/token'
 	];
@@ -466,7 +178,6 @@ function refreshAuth()
 
 	Promise.all(requests)
 		.then((results) => {
-			console.log(results);
 			if (results[0].status === 401)
 			{
 				alert('Refresh token failed');
@@ -482,7 +193,7 @@ function refreshAuth()
 				};
 				fs.writeFileSync("settings.json", JSON.stringify(config))
 				client.disconnect();
-				log('Twitch Client closed');
+				log('Twitch Client closed',-1);
 				client = new tmi.client(twitch_options);
 				client.on('message', onMessageHandler);
 				client.on('connected', onConnectedHandler);
@@ -491,7 +202,7 @@ function refreshAuth()
 
 			}
 		}).catch(function (err) {
-			log(err);
+			log(err,2);
 			exit(5);
 		})
 
@@ -503,36 +214,43 @@ function onMessageHandler(target, context, msg, self) {
 
 	if (msg.substr(0, 1) == '!') // Do we have a command ?
 	{
-		log(target + ': @' + context.username + ': ' + msg);
+		log(target + ': @' + context.username + ': ' + msg,-1);
 		const posDelim = msg.indexOf(' ');
 		if (posDelim != -1) {
 			const commandName = msg.substr(0, posDelim).trim();
-			const commandArgs = msg.substr(posDelim, msg.length - posDelim).trim();
+			const cmd_args = msg.substr(posDelim, msg.length - posDelim).trim();
+			var commandArgs=cmd_args.split(',');
 
 			// If the command is known, let's execute it
 			if (commandName.toLowerCase() == '!' + locale.shiprent_command) {
-				const res = getShipPrice(commandArgs, 'rent', locale.shiprent_limit)
+				const res = getShipPrice(commandArgs[0], 'rent', locale.shiprent_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.shipbuy_command) {
-				const res = getShipPrice(commandArgs, 'buy', locale.shipbuy_limit)
+				const res = getShipPrice(commandArgs[0], 'buy', locale.shipbuy_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.infobuy_command) {
-				const res = getCommoditiesPrice(commandArgs, 'buy', locale.infobuy_limit)
+				const res = getCommoditiesPrice(commandArgs[0], 'buy', locale.infobuy_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.infosell_command) {
-				const res = getCommoditiesPrice(commandArgs, 'sell', locale.infosell_limit)
+				const res = getCommoditiesPrice(commandArgs[0], 'sell', locale.infosell_limit)
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.trade_command) {
-				var res = getCommoditiesPrice(commandArgs, 'buy', locale.trade_limit)
-				res = res + ' <=> ' + getCommoditiesPrice(commandArgs, 'sell', locale.trade_limit)
+				var res = getCommoditiesPrice(commandArgs[0], 'buy', locale.trade_limit)
+				res = res + ' <=> ' + getCommoditiesPrice(commandArgs[0], 'sell', locale.trade_limit)
+				if (res != undefined) {
+					sendMe(target, res, context);
+				}
+			} else if (commandName.toLowerCase() == '!tadd' )
+			{
+				var res = addToDatabase(commandArgs);
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
@@ -581,5 +299,5 @@ function sendMe(target, message, context) {
 
 // Called every time the bot connects to Twitch chat
 function onConnectedHandler(addr, port) {
-	log(`Connected to ${addr}:${port}`);
+	log(`Connected to ${addr}:${port}`,0);
 }

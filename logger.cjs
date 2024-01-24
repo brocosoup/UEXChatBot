@@ -3,9 +3,9 @@ module.exports = {
   setLogLevel
 };
 
-var logLevel = 1;
+var logLevel = 0;
 
-function log(message, level = 0) {
+function log(message, level = -1) {
   if (level >= logLevel)
     console.log("LOGGER: " + message);
 }
