@@ -272,14 +272,12 @@ function setCommoditiesPrice(commName, type, location,price) {
                         message = computeMessage(locale.commodity_get, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'],jsonTradeportsData.data[tradeport]['name'],jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
                         if (price != undefined)
                         {
-                            console.log(jsonTradeportsData.data[tradeport]['prices'][commodity]);
                             jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]=price;
                             message = computeMessage(locale.commodity_set, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'],jsonTradeportsData.data[tradeport]['name'],jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
                         }
                         
                     }
                 }
-                console.log(jsonTradeportsData.data[tradeport].prices);
                 if (found == false && type == 'buy')
                 {
                     const res = {
