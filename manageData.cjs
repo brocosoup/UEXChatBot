@@ -1,13 +1,14 @@
 const logger = require('./logger.cjs');
 const fs = require('node:fs');
 var locale;
+var receivedUpdate = false;
 
 function setLocale(localeToSet) {
     locale = localeToSet;
 }
 
 module.exports = {
-    addToDatabase, getShipPrice, getCommoditiesPrice, computeMessage, refreshAPI, setLocale
+    addToDatabase, getShipPrice, getCommoditiesPrice, computeMessage, refreshAPI, setLocale, saveData, receivedUpdate
 }
 
 function addToDatabase(ressource) {
@@ -311,6 +312,7 @@ function setCommoditiesPrice(commName, typeSet, location='', price) {
 
                         if (price != undefined && price != '') {
                             jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] = price;
+                            receivedUpdate = true;
                             if (type == 'buy')
                                 message = computeMessage(locale.commodity_set_buy, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], price]);
                             else if (type == 'sell')
@@ -390,4 +392,19 @@ function compareShipByPriceAsc(a, b) {
 }
 
 
+
+function saveData()
+{
+    if (!receivedUpdate)
+        return;
+    receivedUpdate = false;
+    logger.log('Saving Data',-1);
+    fs.writeFile("jsonShipDataUpdate.json", JSON.stringify(jsonShipData), (err) => {
+        if (err)
+            logger.log(err, 2);
+        else
+            logger.log("jsonShipDataUpdate.json updated successfully", -1);
+    });
+    
+}
 

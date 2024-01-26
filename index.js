@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import server from './server.cjs';
 import { exit } from 'node:process';
 import {log, setLogLevel} from './logger.cjs';
-import { addToDatabase,refreshAPI,getShipPrice,getCommoditiesPrice,setLocale,computeMessage } from './manageData.cjs';
+import { addToDatabase,refreshAPI,getShipPrice,getCommoditiesPrice,setLocale,computeMessage,saveData } from './manageData.cjs';
 
 setLogLevel(-1); //-1 for debug, 0 for info, 1 for warning, 2 for errors only
 
@@ -92,6 +92,7 @@ function alert(err)
 
 setInterval(checkAuth, 1000 * 60 * 10);
 log('Checking for oauth validity every 10 minutes',1);
+setInterval(saveData,1000*60*1);
 
 var listTimeout = [];
 function clearRefreshs()
