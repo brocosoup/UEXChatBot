@@ -12,7 +12,7 @@ module.exports = {
 }
 
 function addToDatabase(ressource) {
-    if (ressource.length >= 3 && ressource.length <=4)
+    if (ressource.length >= 3 && ressource.length <= 4)
         return setCommoditiesPrice(ressource[0], ressource[1], ressource[2], ressource[3]);
     else
         return undefined;
@@ -76,6 +76,11 @@ function refreshAPI(api_settings) {
                 jsonTradeportsData = JSON.parse(rawTradeportsdata);
                 logger.log('Using local data for jsonTradeportsData', -1);
             }
+            if (fs.existsSync('jsonTradeportsDataUp.json'))
+            {
+                jsonTradeportsData = JSON.parse(fs.readFileSync('jsonTradeportsDataUp.json'));
+                logger.log('Loaded updated data for jsonTradeportsData', -1);
+            } 
         }).catch(function (err) {
             logger.log(err, 2);
         })
@@ -269,7 +274,7 @@ function getListofName(list) {
     return res;
 }
 
-function setCommoditiesPrice(commName, typeSet, location='', price) {
+function setCommoditiesPrice(commName, typeSet, location = '', price) {
     const listCommodities = getListCommodities(commName.replace(/^ */g, '').replace(/ *$/g, ''));
     const listLoc = getListLocation(location.replace(/^ */g, '').replace(/ *$/g, ''));
     const type = typeSet.replace(/ /g, ''.replace(/^ */g, '').replace(/ *$/g, ''));
@@ -342,8 +347,7 @@ function setCommoditiesPrice(commName, typeSet, location='', price) {
             }
         }
     }
-    if (message== '' )
-    {
+    if (message == '') {
         message = computeMessage(locale.not_found, []);
     }
     return message;
@@ -393,18 +397,17 @@ function compareShipByPriceAsc(a, b) {
 
 
 
-function saveData()
-{
+function saveData() {
     if (!receivedUpdate)
         return;
     receivedUpdate = false;
-    logger.log('Saving Data',-1);
-    fs.writeFile("jsonShipDataUpdate.json", JSON.stringify(jsonShipData), (err) => {
+    logger.log('Saving Data', -1);
+    fs.writeFile("jsonTradeportsDataUp.json", JSON.stringify(jsonTradeportsData), (err) => {
         if (err)
             logger.log(err, 2);
         else
-            logger.log("jsonShipDataUpdate.json updated successfully", -1);
+            logger.log("jsonTradeportsDataUp.json updated successfully", -1);
     });
-    
+
 }
 

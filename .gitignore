@@ -137,4 +137,5 @@ jsonTradeportsData.json
 locale.json
 server.json
 sslcerts/
-jsonShipDataUpdate.json
+jsonShipDataUp.json
+jsonTradeportsDataUp.json
