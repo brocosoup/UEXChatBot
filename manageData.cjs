@@ -314,9 +314,11 @@ function setCommoditiesPrice(commName, typeSet, location = '', price) {
                             message = computeMessage(locale.commodity_get_buy, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
                         else if (type == 'sell' && jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] > 0)
                             message = computeMessage(locale.commodity_get_sell, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
-
-                        if (price != undefined && price != '') {
+                        price = parseInt(price)
+                        if (price != undefined && price != '' && !isNaN(price)) {
                             jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] = price;
+                            jsonTradeportsData.data[tradeport]['prices'][commodity]['date_update'] = Math.floor(new Date().getTime() / 1000);
+                            jsonTradeportsData.data[tradeport]['prices'][commodity]['is_updated'] = true;
                             receivedUpdate = true;
                             if (type == 'buy')
                                 message = computeMessage(locale.commodity_set_buy, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], price]);
