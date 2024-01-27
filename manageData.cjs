@@ -115,12 +115,12 @@ function getListCommodities(commName) {
     let listCommodities = [];
     for (var commodID in jsonCommoditiesData.data) {
         if (commName == undefined) {
-            listCommodities.push({ name: jsonCommoditiesData.data[commodID]['name'], code: jsonCommoditiesData.data[commodID]['code'] });
+            listCommodities.push({ name: jsonCommoditiesData.data[commodID]['name'], code: jsonCommoditiesData.data[commodID]['code'],kind: jsonCommoditiesData.data[commodID]['kind']});
         } else if (jsonCommoditiesData.data[commodID]['name'].toLowerCase() == commName.toLowerCase()) {
-            listCommodities = [{ name: jsonCommoditiesData.data[commodID]['name'], code: jsonCommoditiesData.data[commodID]['code'] }];
+            listCommodities = [{ name: jsonCommoditiesData.data[commodID]['name'], code: jsonCommoditiesData.data[commodID]['code'],kind: jsonCommoditiesData.data[commodID]['kind']}];
             return listCommodities;
         } else if (jsonCommoditiesData.data[commodID]['name'].toLowerCase().includes(commName.toLowerCase())) {
-            listCommodities.push({ name: jsonCommoditiesData.data[commodID]['name'], code: jsonCommoditiesData.data[commodID]['code'] });
+            listCommodities.push({ name: jsonCommoditiesData.data[commodID]['name'], code: jsonCommoditiesData.data[commodID]['code'],kind: jsonCommoditiesData.data[commodID]['kind']});
         }
     }
     return listCommodities;
