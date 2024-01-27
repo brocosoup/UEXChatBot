@@ -38,15 +38,12 @@ export default async function run() {
     } else if (command.split(' ')[0] == 'part') {
       const channel = command.split(' ')[1].split(',')[0];
       const actual_list = getsetChannels();
-      console.log(actual_list);
       if (actual_list.includes(channel) || actual_list.includes('#'+channel)) {
         var index = getsetChannels().indexOf('#'+channel);
-        console.log(index);
         if (index != -1)
           getsetChannels().splice(getsetChannels().indexOf('#'+channel), 1);
 
         index = getsetChannels().indexOf(channel);
-        console.log(index);
         if (index != -1)
           getsetChannels().splice(getsetChannels().indexOf(channel), 1);
         console.log(getsetChannels());
