@@ -33,7 +33,7 @@ export default async function run() {
     {
       repeatLastCommands();
     } else {
-      let msgArray = messageHandle('#console', {username: 'localconsole'}, command,getLocale())
+      let msgArray = messageHandle('#console', {username: 'localconsole', 'display-name': 'LocalConsole'}, command,getLocale())
       for (var msg in msgArray) {
         console.log(msgArray[msg]);
       }
