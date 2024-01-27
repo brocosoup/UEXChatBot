@@ -320,7 +320,6 @@ function setCommoditiesPrice(commName, typeSet, location = '', price,user) {
                         price = parseInt(price)
                         if (price != undefined && price != '' && !isNaN(price)) {
                             updatesLog.push({user: user, commodity: jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], operation: type, location: jsonTradeportsData.data[tradeport]['name'], price : price})
-                            console.log(updatesLog);
                             jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] = price;
                             jsonTradeportsData.data[tradeport]['prices'][commodity]['date_update'] = Math.floor(new Date().getTime() / 1000);
                             jsonTradeportsData.data[tradeport]['prices'][commodity]['is_updated'] = true;
