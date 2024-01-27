@@ -48,11 +48,7 @@ export default async function run() {
         reconnect_twitch();
       }
     } else if (command == 'listchan') {
-      const channel = command.split(' ')[1].split(',')[0];
-      const actual_list = getsetChannels();
-      if (actual_list.includes(channel) || actual_list.includes('#' + channel)) {
-        console.log(getsetChannels());
-      }
+      console.log(getsetChannels());
     } else {
       let msgArray = messageHandle('#console', { username: 'localconsole', 'display-name': 'LocalConsole' }, command, getLocale())
       for (var msg in msgArray) {
