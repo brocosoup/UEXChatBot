@@ -215,7 +215,6 @@ export function reconnect_twitch()
 	fs.writeFileSync("settings.json", JSON.stringify(config))
 	client.disconnect();
 	log('Twitch Client closed',1);
-	console.log(twitch_options);
 	client = new tmi.client(twitch_options);
 	client.on('message', onMessageHandler);
 	client.on('connected', onConnectedHandler);
