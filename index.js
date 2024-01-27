@@ -30,26 +30,30 @@ export default async function run() {
     } else if (command.split(' ')[0] == 'join') {
       const channel = command.split(' ')[1].split(',')[0];
       const actual_list = getsetChannels();
-      if ((!actual_list.includes(channel)) && (!actual_list.includes('#'+channel))) {
+      if ((!actual_list.includes(channel)) && (!actual_list.includes('#' + channel))) {
         getsetChannels().push(channel);
-        console.log(getsetChannels());
         reconnect_twitch();
       }
     } else if (command.split(' ')[0] == 'part') {
       const channel = command.split(' ')[1].split(',')[0];
       const actual_list = getsetChannels();
-      if (actual_list.includes(channel) || actual_list.includes('#'+channel)) {
-        var index = getsetChannels().indexOf('#'+channel);
+      if (actual_list.includes(channel) || actual_list.includes('#' + channel)) {
+        var index = getsetChannels().indexOf('#' + channel);
         if (index != -1)
-          getsetChannels().splice(getsetChannels().indexOf('#'+channel), 1);
+          getsetChannels().splice(getsetChannels().indexOf('#' + channel), 1);
 
         index = getsetChannels().indexOf(channel);
         if (index != -1)
           getsetChannels().splice(getsetChannels().indexOf(channel), 1);
-        console.log(getsetChannels());
         reconnect_twitch();
       }
-    }  else {
+    } else if (command == 'listchan') {
+      const channel = command.split(' ')[1].split(',')[0];
+      const actual_list = getsetChannels();
+      if (actual_list.includes(channel) || actual_list.includes('#' + channel)) {
+        console.log(getsetChannels());
+      }
+    } else {
       let msgArray = messageHandle('#console', { username: 'localconsole', 'display-name': 'LocalConsole' }, command, getLocale())
       for (var msg in msgArray) {
         console.log(msgArray[msg]);
