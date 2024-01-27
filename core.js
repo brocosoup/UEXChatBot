@@ -192,8 +192,10 @@ function refreshAuth()
 				alert('Refresh token failed');
 			} else {
 				config.identity.password = 'oauth:' + results[0].access_token;
+				log('oauth:' + results[0].access_token,-1)
 				config.refreshToken = results[0].refresh_token;
-				var twitch_options = {
+				log('oauth:' + results[0].refresh_token,-1)
+				twitch_options = {
 					identity: {
 						'username': config.identity.username,
 						'password': config.identity.password
