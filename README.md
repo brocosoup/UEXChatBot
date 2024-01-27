@@ -33,7 +33,7 @@ npm start
   Navigate to `http://localhost:3000`
   Login to twitch
   
-- Check settings.json
+- Check settings.json and server.json
 	* Get an API key from https://uexcorp.space/api.html (optional if you have json files)
  	* username is the bot twitch username (e.g. mybot)
 	* password if your oauth key from twitchapps (e.g. oauth:ks478f8fveruijnze545645)
@@ -41,9 +41,26 @@ npm start
   	* channels is a table containing one channel (e.g. "channels": [ "mychannel" ] ) or a list of channels (e.g. "channels": ["mychannel","myotherchannel"] )
 ```json
 {
-	"username": "mybot",
-	"password": "oauth:ks478f8fveruijnze545645",
-	"api_key": "ezf4897bg156trg4899bv156r189189",
-	"channels": [ "mychannel" ]
+	"server": {
+		"client": "changeme",
+		"secret": "changeme",
+		"session": "changeme",
+		"callback": "http://localhost:3000/auth/twitch/callback",
+		"port": 3000,
+		"privateKey": "",
+		"certificate": ""
+	}
+}
+```
+```json
+{
+    "identity": {
+        "username": "",
+        "password": ""
+    },
+    "channels": [
+        ""
+    ],
+    "api_key": ""
 }
 ```
