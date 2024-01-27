@@ -255,6 +255,7 @@ export function messageHandle(target, context, msg,myLocale)
 	{
 		log(target + ': @' + context.username + ': ' + msg,-1);
 		const posDelim = msg.indexOf(' ');
+		var res = '';
 		if (posDelim != -1) {
 			const commandName = msg.substr(0, posDelim).trim();
 			const cmd_args = msg.substr(posDelim, msg.length - posDelim).trim();
@@ -262,38 +263,36 @@ export function messageHandle(target, context, msg,myLocale)
 
 			// If the command is known, let's execute it
 			if (commandName.toLowerCase() == '!' + myLocale.shiprent_command) {
-				const res = getShipPrice(commandArgs[0], 'rent', myLocale.shiprent_limit)
+				res = getShipPrice(commandArgs[0], 'rent', myLocale.shiprent_limit)
 			} else if (commandName.toLowerCase() == '!' + myLocale.shipbuy_command) {
-				const res = getShipPrice(commandArgs[0], 'buy', myLocale.shipbuy_limit)
+				res = getShipPrice(commandArgs[0], 'buy', myLocale.shipbuy_limit)
 			} else if (commandName.toLowerCase() == '!' + myLocale.infobuy_command) {
-				const res = getCommoditiesPrice(commandArgs[0], 'buy', myLocale.infobuy_limit)
+				res = getCommoditiesPrice(commandArgs[0], 'buy', myLocale.infobuy_limit)
 			} else if (commandName.toLowerCase() == '!' + myLocale.infosell_command) {
-				const res = getCommoditiesPrice(commandArgs[0], 'sell', myLocale.infosell_limit)
+				res = getCommoditiesPrice(commandArgs[0], 'sell', myLocale.infosell_limit)
 			} else if (commandName.toLowerCase() == '!' + myLocale.trade_command) {
-				var res = getCommoditiesPrice(commandArgs[0], 'buy', myLocale.trade_limit)
+				res = getCommoditiesPrice(commandArgs[0], 'buy', myLocale.trade_limit)
 				res = res + ' <=> ' + getCommoditiesPrice(commandArgs[0], 'sell', myLocale.trade_limit)
 			} else if (commandName.toLowerCase() == '!' + myLocale.tadd_command )
 			{
-				var res = addToDatabase(commandArgs,{target: target, context: context});
+				res = addToDatabase(commandArgs,{target: target, context: context});
 			}
-
-
 		} else {
 			const commandName = msg.trim();
 			if (commandName == '!' + myLocale.shiprent_command) {
-				var res = computeMessage(myLocale.shiprent_usage, [myLocale.shiprent_command]);
+				res = computeMessage(myLocale.shiprent_usage, [myLocale.shiprent_command]);
 			} else if (commandName == '!' + myLocale.shipbuy_command) {
-				var res = computeMessage(myLocale.shipbuy_usage, [myLocale.shipbuy_command]);
+				res = computeMessage(myLocale.shipbuy_usage, [myLocale.shipbuy_command]);
 			} else if (commandName == '!' + myLocale.help_command) {
-				var res = computeMessage(myLocale.help_message, [myLocale.shiprent_command, myLocale.shipbuy_command, myLocale.infosell_command, myLocale.infobuy_command, myLocale.coucou_command, myLocale.trade_command, myLocale.tadd_command]);
+				res = computeMessage(myLocale.help_message, [myLocale.shiprent_command, myLocale.shipbuy_command, myLocale.infosell_command, myLocale.infobuy_command, myLocale.coucou_command, myLocale.trade_command, myLocale.tadd_command]);
 			} else if (commandName == '!' + myLocale.infosell_command) {
-				var res = computeMessage(myLocale.infosell_usage, [myLocale.infosell_command]);
+				res = computeMessage(myLocale.infosell_usage, [myLocale.infosell_command]);
 			} else if (commandName == '!' + myLocale.infobuy_command) {
-				var res = computeMessage(myLocale.infobuy_usage, [myLocale.infobuy_command]);
+				res = computeMessage(myLocale.infobuy_usage, [myLocale.infobuy_command]);
 			} else if (commandName == '!' + myLocale.coucou_command) {
-				var res = computeMessage(myLocale.coucou_message, [myLocale.help_command]);
+				res = computeMessage(myLocale.coucou_message, [myLocale.help_command]);
 			} else if (commandName == '!' + myLocale.trade_command) {
-				var res = computeMessage(myLocale.trade_usage, [myLocale.trade_command]);
+				res = computeMessage(myLocale.trade_usage, [myLocale.trade_command]);
 			}
 		}
 		if (res != undefined) {
