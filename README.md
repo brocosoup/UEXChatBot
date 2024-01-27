@@ -64,3 +64,5 @@ npm start
     "api_key": ""
 }
 ```
+# How to use it:
+
