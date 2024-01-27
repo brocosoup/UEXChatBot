@@ -2,6 +2,7 @@ const logger = require('./logger.cjs');
 const fs = require('node:fs');
 var locale;
 var receivedUpdate = false;
+var updatesLog = [];
 
 function setLocale(localeToSet) {
     locale = localeToSet;
@@ -11,9 +12,11 @@ module.exports = {
     addToDatabase, getShipPrice, getCommoditiesPrice, computeMessage, refreshAPI, setLocale, saveData, receivedUpdate
 }
 
-function addToDatabase(ressource) {
+function addToDatabase(ressource,user) {
     if (ressource.length >= 3 && ressource.length <= 4)
-        return setCommoditiesPrice(ressource[0], ressource[1], ressource[2], ressource[3]);
+    {
+        return setCommoditiesPrice(ressource[0], ressource[1], ressource[2], ressource[3],user);
+    }
     else
         return undefined;
 }
@@ -274,7 +277,7 @@ function getListofName(list) {
     return res;
 }
 
-function setCommoditiesPrice(commName, typeSet, location = '', price) {
+function setCommoditiesPrice(commName, typeSet, location = '', price,user) {
     const listCommodities = getListCommodities(commName.replace(/^ */g, '').replace(/ *$/g, ''));
     const listLoc = getListLocation(location.replace(/^ */g, '').replace(/ *$/g, ''));
     const type = typeSet.replace(/ /g, ''.replace(/^ */g, '').replace(/ *$/g, ''));
@@ -316,6 +319,8 @@ function setCommoditiesPrice(commName, typeSet, location = '', price) {
                             message = computeMessage(locale.commodity_get_sell, [jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], jsonTradeportsData.data[tradeport]['name'], jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type]]);
                         price = parseInt(price)
                         if (price != undefined && price != '' && !isNaN(price)) {
+                            updatesLog.push({user: user, commodity: jsonTradeportsData.data[tradeport]['prices'][commodity]['name'], operation: type, location: jsonTradeportsData.data[tradeport]['name'], price : price})
+                            console.log(updatesLog);
                             jsonTradeportsData.data[tradeport]['prices'][commodity]['price_' + type] = price;
                             jsonTradeportsData.data[tradeport]['prices'][commodity]['date_update'] = Math.floor(new Date().getTime() / 1000);
                             jsonTradeportsData.data[tradeport]['prices'][commodity]['is_updated'] = true;
@@ -410,6 +415,11 @@ function saveData() {
         else
             logger.log("jsonTradeportsDataUp.json updated successfully", -1);
     });
-
+    fs.writeFile("updatesLog.json", JSON.stringify(updatesLog), (err) => {
+        if (err)
+            logger.log(err, 2);
+        else
+            logger.log("updatesLog.json updated successfully", -1);
+    });
 }
 

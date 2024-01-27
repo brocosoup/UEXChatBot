@@ -251,7 +251,7 @@ function onMessageHandler(target, context, msg, self) {
 				}
 			} else if (commandName.toLowerCase() == '!' + locale.tadd_command )
 			{
-				var res = addToDatabase(commandArgs);
+				var res = addToDatabase(commandArgs,{target: target, context: context});
 				if (res != undefined) {
 					sendMe(target, res, context);
 				}
