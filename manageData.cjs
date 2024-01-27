@@ -84,6 +84,11 @@ function refreshAPI(api_settings) {
                 jsonTradeportsData = JSON.parse(fs.readFileSync('jsonTradeportsDataUp.json'));
                 logger.log('Loaded updated data for jsonTradeportsData', -1);
             } 
+            if (fs.existsSync('updatesLog.json'))
+            {
+                updatesLog = JSON.parse(fs.readFileSync('updatesLog.json'));
+                logger.log('Loaded updated data for updatesLog', -1);
+            } 
         }).catch(function (err) {
             logger.log(err, 2);
         })
