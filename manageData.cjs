@@ -9,7 +9,7 @@ function setLocale(localeToSet) {
 }
 
 module.exports = {
-    addToDatabase, getShipPrice, getCommoditiesPrice, computeMessage, refreshAPI, setLocale, saveData, receivedUpdate
+    addToDatabase, getShipPrice, getCommoditiesPrice, computeMessage, refreshAPI, setLocale, saveData, receivedUpdate,repeatLastCommands
 }
 
 function addToDatabase(ressource,user) {
@@ -425,4 +425,12 @@ function saveData(force=false) {
         else
             logger.log("updatesLog.json updated successfully", -1);
     });
+}
+
+function repeatLastCommands()
+{
+    for (var entry in updatesLog)
+    {
+        console.log(`${updatesLog[entry].user.context['display-name']}: !tu ${updatesLog[entry].commodity},${updatesLog[entry].operation},${updatesLog[entry].location},${updatesLog[entry].price}`)
+    }
 }

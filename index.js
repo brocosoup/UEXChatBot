@@ -2,7 +2,7 @@
 
 import inquirer from 'inquirer';
 import { messageHandle, getLocale,getClient } from './core.js';
-import { saveData } from './manageData.cjs';
+import { saveData,repeatLastCommands } from './manageData.cjs';
 import {setLogLevel} from './logger.cjs';
 
 export default async function run() {
@@ -29,6 +29,9 @@ export default async function run() {
     } else if (command == 'save')
     {
       saveData(true);
+    } else if (command == 'showlast')
+    {
+      repeatLastCommands();
     } else {
       let msgArray = messageHandle('#console', {username: 'localconsole'}, command,getLocale())
       for (var msg in msgArray) {
