@@ -408,8 +408,8 @@ function compareShipByPriceAsc(a, b) {
 
 
 
-function saveData() {
-    if (!receivedUpdate)
+function saveData(force=false) {
+    if (!receivedUpdate && !force)
         return;
     receivedUpdate = false;
     logger.log('Saving Data', -1);
@@ -426,4 +426,3 @@ function saveData() {
             logger.log("updatesLog.json updated successfully", -1);
     });
 }
-
