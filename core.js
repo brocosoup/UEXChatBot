@@ -7,7 +7,7 @@ import {log, setLogLevel} from './logger.cjs';
 import { addToDatabase,refreshAPI,getShipPrice,getCommoditiesPrice,setLocale,computeMessage,saveData } from './manageData.cjs';
 //import console from './console.js';
 
-setLogLevel(1); //-1 for debug, 0 for info, 1 for warning, 2 for errors only
+setLogLevel(0); //-1 for debug, 0 for info, 1 for warning, 2 for errors only
 
 function initJSONFile(file) {
 	if (!fs.existsSync(file + '.json')) {
@@ -61,6 +61,7 @@ const api_settings = {
 
 refreshAPI(api_settings);
 
+
 // Connect to Twitch:
 // Create a client with our options
 var twitch_options = {
@@ -71,14 +72,20 @@ var twitch_options = {
 	channels: config.channels,
 };
 
+export function getsetChannels(channels = twitch_options.channels)
+{
+	config.channels = channels;
+	twitch_options.channels = channels;
+	log('chan set to: ' + channels);
+	return twitch_options.channels;
+}
+
 var client = new tmi.client(twitch_options)
 
 // Register our event handlers (defined below)
 client.on('message', onMessageHandler);
 client.on('connected', onConnectedHandler);
-
 checkAuth();
-
 client.connect()
 	.catch(err => alert(err))
 
@@ -193,14 +200,7 @@ function refreshAuth()
 					},
 					channels: config.channels,
 				};
-				fs.writeFileSync("settings.json", JSON.stringify(config))
-				client.disconnect();
-				log('Twitch Client closed',-1);
-				client = new tmi.client(twitch_options);
-				client.on('message', onMessageHandler);
-				client.on('connected', onConnectedHandler);
-				client.connect()
-					.catch(err => alert(err))
+				reconnect_twitch();
 
 			}
 		}).catch(function (err) {
@@ -210,6 +210,18 @@ function refreshAuth()
 
 }
 
+export function reconnect_twitch()
+{
+	fs.writeFileSync("settings.json", JSON.stringify(config))
+	client.disconnect();
+	log('Twitch Client closed',1);
+	console.log(twitch_options);
+	client = new tmi.client(twitch_options);
+	client.on('message', onMessageHandler);
+	client.on('connected', onConnectedHandler);
+	client.connect()
+		.catch(err => alert(err))
+}
 // Called every time a message comes in
 function onMessageHandler(target, context, msg, self) {
 	if (self) { return; } // Ignore messages from the bot
@@ -298,7 +310,5 @@ export function messageHandle(target, context, msg,myLocale)
 		if (res != undefined) {
 			return(sendMe(target, res, context));
 		}
-
-
 	}
 }
