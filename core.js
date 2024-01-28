@@ -306,6 +306,8 @@ export function messageHandle(target, context, msg,myLocale)
 				res = computeMessage(myLocale.coucou_message, [myLocale.help_command]);
 			} else if (commandName == '!' + myLocale.trade_command) {
 				res = computeMessage(myLocale.trade_usage, [myLocale.trade_command]);
+			} else if (commandName == '!' + myLocale.update_command) {
+				res = computeMessage(myLocale.update_usage, [myLocale.update_command]);
 			}
 		}
 		if (res != undefined) {
