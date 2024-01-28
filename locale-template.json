@@ -43,7 +43,7 @@
 	"shiprent_command": "ship_rent",
 	"tadd_command": "update",
 	"infobuy_command": "buy",
-	"infosell_command": "sellts",
+	"infosell_command": "sell",
 	"help_command": "sc_commands",
 	"trade_command": "route",
 	"coucou_command": "ccsc"
