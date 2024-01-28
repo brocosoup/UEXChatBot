@@ -1,6 +1,6 @@
 import tmi from 'tmi.js';
 import fetch from 'node-fetch';
-import fs from 'node:fs';
+import fs, { existsSync } from 'node:fs';
 import server from './server.cjs';
 import { exit } from 'node:process';
 import {log, setLogLevel} from './logger.cjs';
@@ -21,6 +21,7 @@ initJSONFile('locale');
 let rawlocale = fs.readFileSync('locale.json');
 const locale = await JSON.parse(rawlocale);
 setLocale(locale);
+var locales = {};
 
 initJSONFile('settings');
 var config = JSON.parse(fs.readFileSync("settings.json"));
@@ -226,7 +227,7 @@ export function reconnect_twitch()
 // Called every time a message comes in
 function onMessageHandler(target, context, msg, self) {
 	if (self) { return; } // Ignore messages from the bot
-	let msgArray = messageHandle(target, context, msg,getLocale())
+	let msgArray = messageHandle(target, context, msg,getLocale(target))
 	for (var msg in msgArray) {
 		client.say(target, msgArray[msg])
 	}
@@ -253,9 +254,22 @@ function onConnectedHandler(addr, port) {
 	log(`Connected to ${addr}:${port}`,0);
 }
 
-export function getLocale()
+export function getLocale(target='')
 {
-	return locale;
+	var myLocale = locale
+	if (target != '' )
+	{	
+		const myTrgt = target.substring(1)
+		if (locales[myTrgt] != undefined)
+		{
+			myLocale = locales[myTrgt];
+		} else if (fs.existsSync(myTrgt + '_locale.json')) {
+			const trawLocale = fs.readFileSync(myTrgt + '_locale.json')
+			locales[myTrgt] = JSON.parse(trawLocale);
+			myLocale = locales[myTrgt];
+		}
+	} 
+	return myLocale;
 }
 
 export function getClient()
@@ -306,8 +320,8 @@ export function messageHandle(target, context, msg,myLocale)
 				res = computeMessage(myLocale.coucou_message, [myLocale.help_command]);
 			} else if (commandName == '!' + myLocale.trade_command) {
 				res = computeMessage(myLocale.trade_usage, [myLocale.trade_command]);
-			} else if (commandName == '!' + myLocale.update_command) {
-				res = computeMessage(myLocale.update_usage, [myLocale.update_command]);
+			} else if (commandName == '!' + myLocale.tadd_command) {
+				res = computeMessage(myLocale.update_usage, [myLocale.tadd_command]);
 			}
 		}
 		if (res != undefined) {

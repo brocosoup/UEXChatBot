@@ -140,3 +140,4 @@ sslcerts/
 jsonShipDataUp.json
 jsonTradeportsDataUp.json
 updatesLog.json
+*_locale.json
