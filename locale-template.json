@@ -44,7 +44,7 @@
 	"tadd_command": "update",
 	"infobuy_command": "buy",
 	"infosell_command": "sell",
-	"help_command": "sc_commands",
+	"help_command": "sc_cmd",
 	"trade_command": "route",
-	"coucou_command": "ccsc"
+	"coucou_command": "sc_cc"
 }
