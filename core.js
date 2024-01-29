@@ -229,7 +229,7 @@ function onMessageHandler(target, context, msg, self) {
 	if (self) { return; } // Ignore messages from the bot
 	let msgArray = messageHandle(target, context, msg,getLocale(target))
 	for (var msg in msgArray) {
-		client.say(target, msgArray[msg])
+		client.say(target, '@' + context.username + ' ' + msgArray[msg])
 	}
 }
 
