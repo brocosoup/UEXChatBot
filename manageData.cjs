@@ -119,6 +119,28 @@ function getShipList(shipName) {
     return shipsList;
 }
 
+function getShipLoc(shipName,type) {
+    var shipsLoc = []
+    for (var ship in shipName)
+    {
+        for (var loc in jsonShipData.data) {
+            if (jsonShipData.data[loc]['name'].toLowerCase() == shipName[ship].toLowerCase()) {
+                if(jsonShipData.data[loc][type +'_at'] != null)
+                {
+                    shipsLoc.push(jsonShipData.data[loc][type +'_at']);
+                    return shipsLoc; //we have a match, we can exit right now!
+                }
+            } else if (jsonShipData.data[loc]['name'].toLowerCase().includes(shipName[ship].toLowerCase())) {
+                if(jsonShipData.data[loc][type +'_at'] != null)
+                {
+                    shipsLoc.push(jsonShipData.data[loc][type +'_at']);
+                }
+            }
+        }
+    }
+    return shipsLoc;
+}
+
 function getListCommodities(commName) {
     let listCommodities = [];
     for (var commodID in jsonCommoditiesData.data) {
@@ -151,13 +173,12 @@ function getListLocation(locName) {
 
 function getShipPrice(shipName, type, max,locale) {
     var listShips = getShipList(shipName);
-    var nbShips = listShips.length;
     var message = computeMessage(locale.not_found,[]);
     if (listShips.length == 1) {
         var ListOfShipsLocs = [];
-        var nbLocs = listShips.length;
+        var nbLocs = getShipLoc([listShips[0]],type);
         var message = '';
-        if (nbLocs == 0) {
+        if (nbLocs.length == 0) {
             // var message = 'Le ' + listShips[0] + ' n\'est pas disponible à l\'achat en jeu.';
             if (type == 'buy')
                 var message = computeMessage(locale.ship_not_available_buy, [listShips[0]]);
@@ -167,7 +188,8 @@ function getShipPrice(shipName, type, max,locale) {
             for (var ship in jsonShipData.data) {
                 var locID = 1;
                 if (jsonShipData.data[ship]['name'].toLowerCase() == listShips[0].toLowerCase()) {
-                    for (var loc in jsonShipData.data[ship][type + '_at']) {
+                    for (var loc in jsonShipData.data[ship][type + '_at']) 
+                    {
                         var apiShipName = jsonShipData.data[ship]['name'];
                         var locSystemName = jsonShipData.data[ship][type + '_at'][loc]['system_name'];
                         var locCityName = jsonShipData.data[ship][type + '_at'][loc]['city_name'];
