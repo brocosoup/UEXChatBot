@@ -4,7 +4,7 @@ import fs, { existsSync } from 'node:fs';
 import server from './server.cjs';
 import { exit } from 'node:process';
 import {log, setLogLevel} from './logger.cjs';
-import { addToDatabase,refreshAPI,getShipPrice,getCommoditiesPrice,setLocale,computeMessage,saveData } from './manageData.cjs';
+import { addToDatabase,refreshAPI,getShipPrice,getCommoditiesPrice/*,setLocale*/,computeMessage,saveData } from './manageData.cjs';
 //import console from './console.js';
 
 setLogLevel(0); //-1 for debug, 0 for info, 1 for warning, 2 for errors only
