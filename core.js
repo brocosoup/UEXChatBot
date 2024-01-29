@@ -290,19 +290,19 @@ export function messageHandle(target, context, msg,myLocale)
 
 			// If the command is known, let's execute it
 			if (commandName.toLowerCase() == '!' + myLocale.shiprent_command) {
-				res = getShipPrice(commandArgs[0], 'rent', myLocale.shiprent_limit)
+				res = getShipPrice(commandArgs[0], 'rent', myLocale.shiprent_limit,myLocale)
 			} else if (commandName.toLowerCase() == '!' + myLocale.shipbuy_command) {
-				res = getShipPrice(commandArgs[0], 'buy', myLocale.shipbuy_limit)
+				res = getShipPrice(commandArgs[0], 'buy', myLocale.shipbuy_limit,myLocale)
 			} else if (commandName.toLowerCase() == '!' + myLocale.infobuy_command) {
-				res = getCommoditiesPrice(commandArgs[0], 'buy', myLocale.infobuy_limit)
+				res = getCommoditiesPrice(commandArgs[0], 'buy', myLocale.infobuy_limit,myLocale)
 			} else if (commandName.toLowerCase() == '!' + myLocale.infosell_command) {
-				res = getCommoditiesPrice(commandArgs[0], 'sell', myLocale.infosell_limit)
+				res = getCommoditiesPrice(commandArgs[0], 'sell', myLocale.infosell_limit,myLocale)
 			} else if (commandName.toLowerCase() == '!' + myLocale.trade_command) {
-				res = getCommoditiesPrice(commandArgs[0], 'buy', myLocale.trade_limit)
-				res = res + ' <=> ' + getCommoditiesPrice(commandArgs[0], 'sell', myLocale.trade_limit)
+				res = getCommoditiesPrice(commandArgs[0], 'buy', myLocale.trade_limit,myLocale)
+				res = res + ' <=> ' + getCommoditiesPrice(commandArgs[0], 'sell', myLocale.trade_limit,myLocale)
 			} else if (commandName.toLowerCase() == '!' + myLocale.tadd_command )
 			{
-				res = addToDatabase(commandArgs,{target: target, context: context});
+				res = addToDatabase(commandArgs,{target: target, context: context},myLocale);
 			}
 		} else {
 			const commandName = msg.trim();

@@ -1,15 +1,15 @@
 const logger = require('./logger.cjs');
 const fs = require('node:fs');
-var locale;
+//var locale;
 var receivedUpdate = false;
 var updatesLog = [];
 
-function setLocale(localeToSet) {
+/*function setLocale(localeToSet) {
     locale = localeToSet;
-}
+}*/
 
 module.exports = {
-    addToDatabase, getShipPrice, getCommoditiesPrice, computeMessage, refreshAPI, setLocale, saveData, receivedUpdate,repeatLastCommands
+    addToDatabase, getShipPrice, getCommoditiesPrice, computeMessage, refreshAPI, /*setLocale,*/ saveData, receivedUpdate,repeatLastCommands
 }
 
 function addToDatabase(ressource,user) {
@@ -149,7 +149,7 @@ function getListLocation(locName) {
     return listLoc;
 }
 
-function getShipPrice(shipName, type, max) {
+function getShipPrice(shipName, type, max,locale) {
     var listShips = getShipList(shipName);
     var nbShips = listShips.length;
     var message = computeMessage(locale.not_found,[]);
@@ -221,7 +221,7 @@ function getShipPrice(shipName, type, max) {
     return message
 }
 
-function getCommoditiesPrice(commName, type, max) {
+function getCommoditiesPrice(commName, type, max,locale) {
     const listCommodities = getListCommodities(commName)
     var message = ''
     if (listCommodities.length == 1) {
@@ -282,7 +282,7 @@ function getListofName(list) {
     return res;
 }
 
-function setCommoditiesPrice(commName, typeSet, location = '', price,user) {
+function setCommoditiesPrice(commName, typeSet, location = '', price,user,locale) {
     const listCommodities = getListCommodities(commName.replace(/^ */g, '').replace(/ *$/g, ''));
     const listLoc = getListLocation(location.replace(/^ */g, '').replace(/ *$/g, ''));
     const type = typeSet.replace(/ /g, ''.replace(/^ */g, '').replace(/ *$/g, ''));
