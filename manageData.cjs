@@ -152,7 +152,7 @@ function getListLocation(locName) {
 function getShipPrice(shipName, type, max) {
     var listShips = getShipList(shipName);
     var nbShips = listShips.length;
-    var message = '';
+    var message = computeMessage(locale.not_found,[]);
     if (listShips.length == 1) {
         var ListOfShipsLocs = [];
         var nbLocs = listShips.length;
