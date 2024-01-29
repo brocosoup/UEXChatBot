@@ -20,7 +20,7 @@ var twitch_refresh_token;
 initJSONFile('locale');
 let rawlocale = fs.readFileSync('locale.json');
 const locale = await JSON.parse(rawlocale);
-setLocale(locale);
+/*setLocale(locale);*/
 var locales = {};
 
 initJSONFile('settings');
