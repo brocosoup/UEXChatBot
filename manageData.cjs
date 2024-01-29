@@ -177,7 +177,6 @@ function getShipPrice(shipName, type, max,locale) {
     if (listShips.length == 1) {
         var ListOfShipsLocs = [];
         var nbLocs = getShipLoc([listShips[0]],type);
-        console.log(nbLocs.length);
         var message = '';
         if (nbLocs.length == 0) {
             // var message = 'Le ' + listShips[0] + ' n\'est pas disponible à l\'achat en jeu.';
