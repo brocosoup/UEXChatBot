@@ -12,10 +12,10 @@ module.exports = {
     addToDatabase, getShipPrice, getCommoditiesPrice, computeMessage, refreshAPI, /*setLocale,*/ saveData, receivedUpdate,repeatLastCommands
 }
 
-function addToDatabase(ressource,user) {
+function addToDatabase(ressource,user,myLocale) {
     if (ressource.length >= 3 && ressource.length <= 4)
     {
-        return setCommoditiesPrice(ressource[0], ressource[1], ressource[2], ressource[3],user);
+        return setCommoditiesPrice(ressource[0], ressource[1], ressource[2], ressource[3],user,myLocale);
     }
     else
         return undefined;
