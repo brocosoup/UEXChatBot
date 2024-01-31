@@ -4,7 +4,7 @@ import fs, { existsSync } from 'node:fs';
 import server from './server.cjs';
 import { exit } from 'node:process';
 import {log, setLogLevel} from './logger.cjs';
-import { addToDatabase,refreshAPI,getShipPrice,getCommoditiesPrice/*,setLocale*/,computeMessage,saveData } from './manageData.cjs';
+import { addToDatabase,refreshAPI,getShipPrice,getCommoditiesPrice/*,setLocale*/,computeMessage,saveData, getListLoc,getListCom } from './manageData.cjs';
 //import console from './console.js';
 
 setLogLevel(0); //-1 for debug, 0 for info, 1 for warning, 2 for errors only
@@ -304,6 +304,12 @@ export function messageHandle(target, context, msg,myLocale)
 			} else if (commandName.toLowerCase() == '!' + myLocale.tadd_command )
 			{
 				res = addToDatabase(commandArgs,{target: target, context: context},myLocale);
+			} else if (commandName.toLowerCase() == '!' + myLocale.listloc_command )
+			{
+				res = getListLoc(commandArgs[0], myLocale.listcom_limit,myLocale);
+			} else if (commandName.toLowerCase() == '!' + myLocale.listcom_command )
+			{
+				res = getListCom(commandArgs[0], myLocale.listcom_limit,myLocale);
 			}
 		} else {
 			const commandName = msg.trim();
@@ -323,6 +329,10 @@ export function messageHandle(target, context, msg,myLocale)
 				res = computeMessage(myLocale.trade_usage, [myLocale.trade_command]);
 			} else if (commandName == '!' + myLocale.tadd_command) {
 				res = computeMessage(myLocale.update_usage, [myLocale.tadd_command]);
+			} else if (commandName == '!' + myLocale.listloc_command) {
+				res = computeMessage(myLocale.listloc_usage, [myLocale.listloc_command]);
+			} else if (commandName == '!' + myLocale.listcom_command) {
+				res = computeMessage(myLocale.listcom_usage, [myLocale.listcom_command]);
 			}
 		}
 		if (res != undefined) {

@@ -16,6 +16,16 @@
 	"commodities_no_loc": "Aucun emplacement de trade(%%2) trouvé pour %%1.",
 	"commodities_too_much": "Désolé, j'ai trouvé trop de réponse correspondante",
 
+	"listloc_found_one": "J'ai trouvé une localité correspondante %%1",
+	"listloc_found_multiple": "J'ai trouvé les localités correspondantes %%1",
+	"listloc_not_found": "Je n'ai trouvé aucune localité correspondante %%1",
+	"listloc_too_much": "Je trouvé trop de localités correspondantes",
+
+	"listcom_found_one": "J'ai trouvé une ressource correspondante %%1",
+	"listcom_found_multiple": "J'ai trouvé les ressources correspondantes %%1",
+	"listcom_not_found": "Je n'ai trouvé aucune ressource correspondante %%1",
+	"listcom_too_much": "Je trouvé trop de ressources correspondantes",
+
 	"not_found": "Désolé, je n'ai rien trouvé",
 
 	"shiprent_usage": "!%%1 <ship>",
@@ -23,7 +33,9 @@
 	"trade_usage": "!%%1 <commodity>",
 	"infosell_usage": "!%%1 <commodity>",
 	"infobuy_usage": "!%%1 <commodity>",
-	"update_usage": "!%%1 <commodity>,<buy/sell>,<location>,<price> ",
+	"listloc_usage": "!%%1 <location>",
+	"listcom_usage": "!%%1 <location>",
+	"update_usage": "!%%1 <location>,<buy/sell>,<commodity>,<price> ",
 
 	"coucou_message": "Hé coucou toi ! Je suis prêt, tu peux afficher mes commandes avec !%%1",
 	"help_message": "Commandes: !%%1, !%%2, !%%3, !%%4, !%%6 et !%%7",
@@ -37,6 +49,8 @@
 	"shiprent_limit": 3,
 	"infosell_limit": 3,
 	"infobuy_limit": 3,
+	"listloc_limit": 8,
+	"listcom_limit": 8,
 	"trade_limit": 1,
 
 	"shipbuy_command": "ship_buy",
@@ -46,5 +60,7 @@
 	"infosell_command": "sell",
 	"help_command": "sc_cmd",
 	"trade_command": "route",
-	"coucou_command": "sc_cc"
+	"coucou_command": "sc_cc",
+	"listloc_command": "location",
+	"listcom_command": "ressource"
 }
