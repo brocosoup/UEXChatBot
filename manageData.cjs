@@ -15,7 +15,7 @@ module.exports = {
 function addToDatabase(ressource,user,myLocale) {
     if (ressource.length >= 3 && ressource.length <= 4)
     {
-        return setCommoditiesPrice(ressource[0], ressource[1], ressource[2], ressource[3],user,myLocale);
+        return setCommoditiesPrice(ressource[2], ressource[1], ressource[0], ressource[3],user,myLocale);
     }
     else
         return undefined;
