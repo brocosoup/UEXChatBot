@@ -9,7 +9,7 @@ var updatesLog = [];
 }*/
 
 module.exports = {
-    addToDatabase, getShipPrice, getCommoditiesPrice, computeMessage, refreshAPI, /*setLocale,*/ saveData, receivedUpdate,repeatLastCommands
+    addToDatabase, getShipPrice, getCommoditiesPrice, computeMessage, refreshAPI, /*setLocale,*/ saveData, receivedUpdate,repeatLastCommands, getListLoc,getListCom
 }
 
 function addToDatabase(ressource,user,myLocale) {
@@ -169,6 +169,52 @@ function getListLocation(locName) {
         }
     }
     return listLoc;
+}
+
+function getListLoc(locName,max,locale)
+{
+    locs = getListLocation(locName)
+    if (locs.length > max)
+    {
+        return computeMessage(locale.listloc_too_much, [locs.length]);
+    } else if (locs.length <= 0)
+    {
+        return computeMessage(locale.listloc_not_found, []);
+    } else if (locs.length == 1)
+    {
+        return computeMessage(locale.listloc_found_one, locs);
+    } else
+    {
+        return computeMessage(locale.listloc_found_multiple, [locs]);
+    }
+}
+
+function getListCom(comName,max,locale)
+{
+    coms = getElement(getListCommodities(comName),'name')
+    if (coms.length > max)
+    {
+        return computeMessage(locale.listcom_too_much, [coms.length]);
+    } else if (coms.length <= 0)
+    {
+        return computeMessage(locale.listcom_not_found, []);
+    } else if (coms.length == 1)
+    {
+        return computeMessage(locale.listcom_found_one, coms);
+    } else
+    {
+        return computeMessage(locale.listcom_found_multiple, [coms]);
+    }
+}
+
+function getElement(arrIn, element)
+{
+    var arrOut = []
+    for (var line in arrIn)
+    {
+        arrOut.push(arrIn[line][element])
+    }
+    return arrOut;
 }
 
 function getShipPrice(shipName, type, max,locale) {
@@ -449,10 +495,10 @@ function saveData(force=false) {
     });
 }
 
-function repeatLastCommands()
+function repeatLastCommands(myLocale)
 {
     for (var entry in updatesLog)
     {
-        console.log(`${updatesLog[entry].user.context['display-name']}: !tu ${updatesLog[entry].commodity},${updatesLog[entry].operation},${updatesLog[entry].location},${updatesLog[entry].price}`)
+        console.log(`${updatesLog[entry].user.context['display-name']}: !${myLocale.tadd_command} ${updatesLog[entry].location},${updatesLog[entry].operation},${updatesLog[entry].commodity},${updatesLog[entry].price}`)
     }
 }

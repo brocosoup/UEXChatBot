@@ -26,7 +26,7 @@ export default async function run() {
     } else if (command == 'save') {
       saveData(true);
     } else if (command == 'showlast') {
-      repeatLastCommands();
+      repeatLastCommands(getLocale());
     } else if (command.split(' ')[0] == 'join') {
       const channel = command.split(' ')[1].split(',')[0];
       const actual_list = getsetChannels();
