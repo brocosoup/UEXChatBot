@@ -19,10 +19,9 @@ export default async function run() {
       isRuntime = false;
       getClient().disconnect();
       process.exit(0);
-    } else if (myCommand == 'logDebug') {
-      setLogLevel(-1);
-    } else if (myCommand == 'logWarning') {
-      setLogLevel(1);
+    } else if (myCommand.split(' ')[0] == 'log') {
+      if(myCommand.split(' ')[1] != '')
+        setLogLevel(myCommand.split(' ')[1]);
     } else if (myCommand == 'save') {
       saveData(true);
     } else if (myCommand == 'showlast') {

@@ -7,8 +7,6 @@ import {log, setLogLevel} from './logger.cjs';
 import { addToDatabase,refreshAPI,getShipPrice,getCommoditiesPrice/*,setLocale*/,computeMessage,saveData, getListLoc,getListCom } from './manageData.cjs';
 //import console from './console.js';
 
-setLogLevel(0); //-1 for debug, 0 for info, 1 for warning, 2 for errors only
-
 function initJSONFile(file) {
 	if (!fs.existsSync(file + '.json')) {
 		fs.writeFileSync(file + '.json', fs.readFileSync(file + '-template.json'))
@@ -77,7 +75,7 @@ export function getsetChannels(channels = twitch_options.channels)
 {
 	config.channels = channels;
 	twitch_options.channels = channels;
-	log('chan set to: ' + channels);
+	log('chan set to: ' + channels,-1);
 	return twitch_options.channels;
 }
 
@@ -100,7 +98,7 @@ function alert(err)
 }
 
 setInterval(checkAuth, 1000 * 60 * 10);
-log('Checking for oauth validity every 10 minutes',0);
+log('Checking for oauth validity every 10 minutes',-1);
 setInterval(saveData,1000*60*1);
 
 var listTimeout = [];
@@ -120,7 +118,7 @@ function checkAuth()
 			'Authorization': 'OAuth ' + config.identity.password.substr('oauth:'.length)
 		},
 	};
-	log('Checking for our oauth2 token validity',-1)
+	log('Checking for our oauth2 token validity now',-1)
 	let api = [
 		'https://id.twitch.tv/oauth2/validate'
 	];
@@ -193,9 +191,9 @@ function refreshAuth()
 				alert('Refresh token failed');
 			} else {
 				config.identity.password = 'oauth:' + results[0].access_token;
-				log('oauth:' + results[0].access_token,-1)
+				log('access_token:' + results[0].access_token,0)
 				config.refreshToken = results[0].refresh_token;
-				log('oauth:' + results[0].refresh_token,-1)
+				log('refresh_token:' + results[0].refresh_token,0)
 				twitch_options = {
 					identity: {
 						'username': config.identity.username,
@@ -217,7 +215,7 @@ export function reconnect_twitch()
 {
 	fs.writeFileSync("settings.json", JSON.stringify(config))
 	client.disconnect();
-	log('Twitch Client closed',1);
+	log('Twitch Client closed',-1);
 	client = new tmi.client(twitch_options);
 	client.on('message', onMessageHandler);
 	client.on('connected', onConnectedHandler);
@@ -259,7 +257,7 @@ function sendMe(target, message, context) {
 
 // Called every time the bot connects to Twitch chat
 function onConnectedHandler(addr, port) {
-	log(`Connected to ${addr}:${port}`,0);
+	log(`Connected to ${addr}:${port}`,-1);
 }
 
 export function getLocale(target='')
@@ -286,9 +284,10 @@ export function getClient()
 }
 export function messageHandle(target, context, msg,myLocale)
 {
+	log(target + ': @' + context.username + ': ' + msg,-2);
 	if (msg.substr(0, 1) == '!') // Do we have a command ?
 	{
-		log(target + ': @' + context.username + ': ' + msg,-1);
+		log(target + ': @' + context.username + ': ' + msg,0);
 		const posDelim = msg.indexOf(' ');
 		var res = '';
 		if (posDelim != -1) {

@@ -132,11 +132,11 @@ function runAuthServ() {
     
     var credentials = {key: privateKey, cert: certificate};
     server = https.createServer(credentials, app).listen(config.server.port, function () {
-      logger.log(`Secure Authentication server listening on port ${config.server.port}!`,1)
+      logger.log(`Secure Authentication server listening on port ${config.server.port}!`,0)
     });
   } else {
     server = app.listen(config.server.port, function () {
-      logger.log(`Authentication server listening on port ${config.server.port}!`,1)
+      logger.log(`Authentication server listening on port ${config.server.port}!`,0)
     });
   }
 }
