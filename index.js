@@ -15,7 +15,6 @@ export default async function run() {
       message: 'UEXChatBot>'
     });
     var myCommand = command.trim().replace(/ {1,}/g, ' ')
-    console.log(myCommand);
     if (myCommand == 'exit') {
       isRuntime = false;
       getClient().disconnect();
