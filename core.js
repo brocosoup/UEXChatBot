@@ -234,6 +234,13 @@ function onMessageHandler(target, context, msg, self) {
 	}
 }
 
+export function sendOnChan(target, msg) {
+	if(msg != '')
+	{
+		client.say(target, msg)
+	}
+}
+
 function sendMe(target, message, context) {
 	const posLimit = 400;
 	var msgArray = [];

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import inquirer from 'inquirer';
-import { messageHandle, getLocale, getClient, getsetChannels, reconnect_twitch } from './core.js';
+import { messageHandle, getLocale, getClient, getsetChannels, reconnect_twitch, sendOnChan } from './core.js';
 import { saveData, repeatLastCommands } from './manageData.cjs';
 import { setLogLevel } from './logger.cjs';
 
@@ -27,6 +27,9 @@ export default async function run() {
       saveData(true);
     } else if (command == 'showlast') {
       repeatLastCommands(getLocale());
+    } else if (command.split(' ')[0] == 'say') {
+      const channel = command.split(' ')[1].split(',')[0];
+      sendOnChan('#' + channel,command.split(',')[1])
     } else if (command.split(' ')[0] == 'join') {
       const channel = command.split(' ')[1].split(',')[0];
       const actual_list = getsetChannels();
