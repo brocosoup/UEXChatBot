@@ -1,6 +1,20 @@
-var jobs = [];
-var users = [];
+import fs, { existsSync } from 'node:fs';
 
+function initJSONFile(file) {
+	if (!fs.existsSync(file + '.json')) {
+		fs.writeFileSync(file + '.json', fs.readFileSync(file + '-template.json'))
+	}
+}
+
+function readJSON(name)
+{
+    initJSONFile(name);
+    let rawlocale = fs.readFileSync(name + '.json');
+    return JSON.parse(rawlocale);
+}
+
+var jobs = readJSON('jobs');
+var users = readJSON('users');
 
 export function proposeJob(target,context,offer)
 {
