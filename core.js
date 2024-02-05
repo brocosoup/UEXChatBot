@@ -5,6 +5,8 @@ import server from './server.cjs';
 import { exit } from 'node:process';
 import {log, setLogLevel} from './logger.cjs';
 import { addToDatabase,refreshAPI,getShipPrice,getCommoditiesPrice/*,setLocale*/,computeMessage,saveData, getListLoc,getListCom } from './manageData.cjs';
+import * as jr from './jobrunner.js';
+
 //import console from './console.js';
 
 function initJSONFile(file) {
@@ -12,8 +14,6 @@ function initJSONFile(file) {
 		fs.writeFileSync(file + '.json', fs.readFileSync(file + '-template.json'))
 	}
 }
-
-var twitch_refresh_token;
 
 initJSONFile('locale');
 let rawlocale = fs.readFileSync('locale.json');
@@ -100,6 +100,7 @@ function alert(err)
 setInterval(checkAuth, 1000 * 60 * 10);
 log('Checking for oauth validity every 10 minutes',-1);
 setInterval(saveData,1000*60*1);
+setInterval(jr.saveALL,1000*60*1);
 
 var listTimeout = [];
 function clearRefreshs()
@@ -136,7 +137,7 @@ function checkAuth()
 				refreshAuth();
 				//alert('Login authentication failed');
 			} else {
-				twitch_refresh_token = Math.round(results[0].expires_in) - 30;
+				var twitch_refresh_token = Math.round(results[0].expires_in) - 30;
 				log('I will refresh the token in ' + Math.round(twitch_refresh_token/60) + ' minutes',-1);
 				clearRefreshs();
 				listTimeout.push(setTimeout(refreshAuth, twitch_refresh_token * 1000));
@@ -316,6 +317,25 @@ export function messageHandle(target, context, msg,myLocale)
 			} else if (commandName.toLowerCase() == '!' + myLocale.listcom_command )
 			{
 				res = getListCom(commandArgs[0], myLocale.listcom_limit,myLocale);
+			} else if (commandName.toLowerCase() == '!' + myLocale.propose_command )
+			{
+				if (commandArgs.length==2)
+					res = jr.proposeJob(target,context,{title:commandArgs[0],gain:commandArgs[1]});
+			} else if (commandName.toLowerCase() == '!' + myLocale.accept_command )
+			{
+				log(`Accepting job ${commandArgs[0]} by ${context['display-name']}`,-1)
+				if (jr.acceptJob(commandArgs[0],context) == 0)
+					res = computeMessage(myLocale.job_accepted,[commandArgs[0],context['display-name'],jr.getUserRating(context['display-name'],1)])
+				else
+					log(`Error accepting job ${commandArgs[0]} by ${context['display-name']}`,-1)
+			} else if (commandName.toLowerCase() == '!' + myLocale.abandon_command )
+			{
+				if (jr.finishJob(commandArgs[0],context,false))
+					res = computeMessage(myLocale.job_abandon,[commandArgs[0],context['display-name'],jr.getUserRating(context['display-name'],1)])
+			} else if (commandName.toLowerCase() == '!' + myLocale.complete_command )
+			{
+				if (jr.finishJob(commandArgs[0],context,true))
+					res = computeMessage(myLocale.job_finish,[commandArgs[0],context['display-name'],jr.getUserRating(context['display-name'],1)])
 			}
 		} else {
 			const commandName = msg.trim();
@@ -339,6 +359,24 @@ export function messageHandle(target, context, msg,myLocale)
 				res = computeMessage(myLocale.listloc_usage, [myLocale.listloc_command]);
 			} else if (commandName == '!' + myLocale.listcom_command) {
 				res = computeMessage(myLocale.listcom_usage, [myLocale.listcom_command]);
+			} else if (commandName == '!' + myLocale.propose_command) {
+				res = computeMessage(myLocale.propose_usage, [myLocale.propose_command]);
+			} else if (commandName == '!' + myLocale.accept_command) {
+				res = computeMessage(myLocale.accept_usage, [myLocale.accept_command]);
+			} else if (commandName == '!' + myLocale.abandon_command) {
+				res = computeMessage(myLocale.abandon_usage, [myLocale.abandon_command]);
+			} else if (commandName == '!' + myLocale.complete_command) {
+				res = computeMessage(myLocale.complete_usage, [myLocale.complete_command]);
+			} else if (commandName == '!' + myLocale.joblist_commands) {
+				res = computeMessage(myLocale.jobs_avail);
+				const jobs = jr.getJobs();
+				for (var job in jobs)
+				{
+					if(jobs[job].validated && !jobs[job].finished && jobs[job].employee === null)
+					{
+						res = res + computeMessage(myLocale.list_job,[job,jobs[job].title,jobs[job].gain,jobs[job].jobgiver['display-name'],jr.getUserRating(jobs[job].jobgiver['display-name'])]) + "; "
+					}
+				}
 			}
 		}
 		if (res != undefined) {

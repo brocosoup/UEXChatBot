@@ -13,6 +13,11 @@ function readJSON(name)
     return JSON.parse(rawlocale);
 }
 
+function saveJSON(name,content)
+{
+    fs.writeFileSync(name + '.json',content)
+}
+
 var jobs = readJSON('jobs');
 var users = readJSON('users');
 
@@ -22,7 +27,7 @@ export function proposeJob(target,context,offer)
         title: offer.title,
         gain: offer.gain,
         jobgiver: context,
-        validated: false,
+        validated: true,
         employee: null,
         target: target,
         success_employer: null,
@@ -39,9 +44,9 @@ export function proposeJob(target,context,offer)
         if (jobs[job].validated === true && jobs[job].employee === null && jobs[job].finished === false)
         {
             if (message === '')
-                message = `${job}: ${jobs[job].jobgiver.display_name} propose '${jobs[job].title}' pour ${jobs[job].gain}`
+                message = `${job}: ${jobs[job].jobgiver['display-name']} propose '${jobs[job].title}' pour ${jobs[job].gain}`
             else
-                message = message + `, ${job}: ${jobs[job].jobgiver.display_name} propose '${jobs[job].title}' pour ${jobs[job].gain}`
+                message = message + `, ${job}: ${jobs[job].jobgiver['display-name']} propose '${jobs[job].title}' pour ${jobs[job].gain}`
         }
     }
     return message;
@@ -55,20 +60,20 @@ function listAllJobs()
         if (jobs[job].employee === null && jobs[job].finished === false)
         {
             if (message === '')
-                message = `${job}: ${jobs[job].jobgiver.display_name} propose '${jobs[job].title}' pour ${jobs[job].gain} Validated:${jobs[job].validated}`
+                message = `${job}: ${jobs[job].jobgiver['display-name']} propose '${jobs[job].title}' pour ${jobs[job].gain} Validated:${jobs[job].validated}`
             else
-                message = message + `, ${job}: ${jobs[job].jobgiver.display_name} propose '${jobs[job].title}' pour ${jobs[job].gain} Validated:${jobs[job].validated}`
+                message = message + `, ${job}: ${jobs[job].jobgiver['display-name']} propose '${jobs[job].title}' pour ${jobs[job].gain} Validated:${jobs[job].validated}`
         } else if (jobs[job].finished === false) {
             
             if (message === '')
-                message = `${job}: ${jobs[job].jobgiver.display_name} propose '${jobs[job].title}' pour ${jobs[job].gain} Accepted by:${jobs[job].employee.display_name}  `
+                message = `${job}: ${jobs[job].jobgiver['display-name']} propose '${jobs[job].title}' pour ${jobs[job].gain} Accepted by:${jobs[job].employee['display-name']}  `
             else
-                message = message + `, ${job}: ${jobs[job].jobgiver.display_name} propose '${jobs[job].title}' pour ${jobs[job].gain} Accepted by:${jobs[job].employee.display_name}  `
+                message = message + `, ${job}: ${jobs[job].jobgiver['display-name']} propose '${jobs[job].title}' pour ${jobs[job].gain} Accepted by:${jobs[job].employee['display-name']}  `
         } else {
             if (message === '')
-                message = `${job}: ${jobs[job].jobgiver.display_name} a proposé '${jobs[job].title}' pour ${jobs[job].gain} Accepted by:${jobs[job].employee.display_name} Success_Employee:${jobs[job].success_employee} Success_Employer:${jobs[job].success_employer}`
+                message = `${job}: ${jobs[job].jobgiver['display-name']} a proposé '${jobs[job].title}' pour ${jobs[job].gain} Accepted by:${jobs[job].employee['display-name']} Success_Employee:${jobs[job].success_employee} Success_Employer:${jobs[job].success_employer}`
             else
-                message = message + `, ${job}: ${jobs[job].jobgiver.display_name} a proposé '${jobs[job].title}' pour ${jobs[job].gain} Accepted by:${jobs[job].employee.display_name} Success_Employee:${jobs[job].success_employee} Success_Employer:${jobs[job].success_employer}`
+                message = message + `, ${job}: ${jobs[job].jobgiver['display-name']} a proposé '${jobs[job].title}' pour ${jobs[job].gain} Accepted by:${jobs[job].employee['display-name']} Success_Employee:${jobs[job].success_employee} Success_Employer:${jobs[job].success_employer}`
         }
     }
     return message;
@@ -86,7 +91,7 @@ export function validateJob(jobID,value)
 
 export function acceptJob(jobID,context)
 {
-    if (jobs[jobID].jobgiver.display_name != context.display_name && jobs[jobID].employee === null)
+    if (jobs[jobID].jobgiver['display-name'] != context['display-name'] && jobs[jobID].employee === null)
     {
         jobs[jobID].employee = context;
         return 0;
@@ -104,12 +109,12 @@ export function finishJob(jobID,context,success)
         if (jobs[jobID].employee != null)
         {
             let ret = 3; //Context is not linked to this job
-            if (jobs[jobID].jobgiver.display_name === context.display_name)
+            if (jobs[jobID].jobgiver['display-name'] === context['display-name'])
             {
                 jobs[jobID].success_employer = success;
                 ret = 0;
             }
-            if (jobs[jobID].employee.display_name === context.display_name)
+            if (jobs[jobID].employee['display-name'] === context['display-name'])
             {
                 jobs[jobID].success_employee = success;
                 ret = 0;
@@ -135,17 +140,17 @@ function refreshRatings()
     {
         if(jobs[job].finished === true)
         {
-            var jobgiver = getUID(jobs[job].jobgiver.display_name,myUsers);
+            var jobgiver = getUID(jobs[job].jobgiver['display-name'],myUsers);
             if (jobgiver == -1)
             {
-                myUsers.push({user: jobs[job].jobgiver.display_name, nb_jobgiver_success: 0, nb_jobgiver_fail:0,nb_employee_success: 0, nb_employee_fail: 0});
+                myUsers.push({user: jobs[job].jobgiver['display-name'], nb_jobgiver_success: 0, nb_jobgiver_fail:0,nb_employee_success: 0, nb_employee_fail: 0});
                 jobgiver = myUsers.length - 1;
             }
 
-            var employee = getUID(jobs[job].employee.display_name,myUsers);
+            var employee = getUID(jobs[job].employee['display-name'],myUsers);
             if (employee == -1)
             {
-                myUsers.push({user: jobs[job].employee.display_name, nb_jobgiver_success: 0, nb_jobgiver_fail:0,nb_employee_success: 0, nb_employee_fail: 0});
+                myUsers.push({user: jobs[job].employee['display-name'], nb_jobgiver_success: 0, nb_jobgiver_fail:0,nb_employee_success: 0, nb_employee_fail: 0});
                 employee = myUsers.length - 1;
             }
 
@@ -182,3 +187,19 @@ export function getRating(uid,myUsers,weight_jobgiver = 1,weight_employee = 1)
     return ((weight_jobgiver * employerRating+ weight_employee * employeeRating)/(weight_jobgiver + weight_employee));
 }
 
+export function getUserRating(name,rate = 1)
+{
+    var userID=getUID(name,users)
+    var rating=1;
+    if (userID != -1)
+    {
+        rating=getRating(userID,users,rate,rate);
+    }
+    return rating;
+}
+
+export function saveALL(force = false)
+{
+    saveJSON('jobs',JSON.stringify(jobs));
+    saveJSON('users',JSON.stringify(users));
+}

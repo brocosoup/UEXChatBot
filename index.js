@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
 import inquirer from 'inquirer';
-import { messageHandle, getLocale, getClient, getsetChannels, reconnect_twitch, sendOnChan } from './core.js';
-import { saveData, repeatLastCommands } from './manageData.cjs';
-import { setLogLevel } from './logger.cjs';
+import * as cs from './core.js';
+import * as md from './manageData.cjs';
+import * as logger from './logger.cjs';
+import * as jr from './jobrunner.js';
 
 export default async function run() {
   console.log('Hi! 👋  I\'m now ready to execute your commands!');
@@ -17,42 +18,45 @@ export default async function run() {
     var myCommand = command.trim().replace(/ {1,}/g, ' ')
     if (myCommand == 'exit') {
       isRuntime = false;
-      getClient().disconnect();
+      cs.getClient().disconnect();
       process.exit(0);
     } else if (myCommand.split(' ')[0] == 'log') {
       if(myCommand.split(' ')[1] != '')
-        setLogLevel(myCommand.split(' ')[1]);
+        logger.setLogLevel(myCommand.split(' ')[1]);
     } else if (myCommand == 'save') {
-      saveData(true);
+      md.saveData(true);
+      jr.saveALL(true);
     } else if (myCommand == 'showlast') {
-      repeatLastCommands(getLocale());
+      md.repeatLastCommands(cs.getLocale());
     } else if (myCommand.split(' ')[0] == 'say') {
       const channel = myCommand.split(' ')[1].split(',')[0].replace(/^ */g, '').replace(/ *$/g, '');
-      sendOnChan('#' + channel,myCommand.split(',')[1])
+      cs.sendOnChan('#' + channel,myCommand.split(',')[1])
     } else if (myCommand.split(' ')[0] == 'join') {
       const channel = myCommand.split(' ')[1].split(',')[0];
-      const actual_list = getsetChannels();
+      const actual_list = cs.getsetChannels();
       if ((!actual_list.includes(channel)) && (!actual_list.includes('#' + channel))) {
-        getsetChannels().push(channel);
-        reconnect_twitch();
+        cs.getsetChannels().push(channel);
+        cs.reconnect_twitch();
       }
     } else if (myCommand.split(' ')[0] == 'part') {
       const channel = myCommand.split(' ')[1].split(',')[0];
-      const actual_list = getsetChannels();
+      const actual_list = cs.getsetChannels();
       if (actual_list.includes(channel) || actual_list.includes('#' + channel)) {
-        var index = getsetChannels().indexOf('#' + channel);
+        var index = cs.getsetChannels().indexOf('#' + channel);
         if (index != -1)
-          getsetChannels().splice(getsetChannels().indexOf('#' + channel), 1);
+          cs.getsetChannels().splice(cs.getsetChannels().indexOf('#' + channel), 1);
 
-        index = getsetChannels().indexOf(channel);
+        index = cs.getsetChannels().indexOf(channel);
         if (index != -1)
-          getsetChannels().splice(getsetChannels().indexOf(channel), 1);
-        reconnect_twitch();
+          cs.getsetChannels().splice(cs.getsetChannels().indexOf(channel), 1);
+        cs.reconnect_twitch();
       }
     } else if (myCommand == 'listchan') {
-      console.log(getsetChannels());
+      console.log(cs.getsetChannels());
+    } else if (myCommand == 'listjobs') {
+      console.log(jr.getJobs());
     } else {
-      let msgArray = messageHandle('#console', { username: 'localconsole', 'display-name': 'LocalConsole' }, myCommand, getLocale())
+      let msgArray = cs.messageHandle('#console', { username: 'localconsole', 'display-name': 'LocalConsole' }, myCommand, cs.getLocale())
       for (var msg in msgArray) {
         console.log(msgArray[msg]);
       }
