@@ -53,8 +53,14 @@ export default async function run() {
       }
     } else if (myCommand == 'listchan') {
       console.log(cs.getsetChannels());
-    } else if (myCommand == 'listjobs') {
-      console.log(jr.getJobs());
+    } else if (myCommand.split(' ')[0] == 'banjob') {
+      const id = myCommand.split(' ')[1].split(',')[0].replace(/^ */g, '').replace(/ *$/g, '');
+      console.log('Banned job ' + id)
+      jr.validateJob(id,false);
+    } else if (myCommand.split(' ')[0] == 'unbanjob') {
+      const id = myCommand.split(' ')[1].split(',')[0].replace(/^ */g, '').replace(/ *$/g, '');
+      console.log('Unbanned job ' + id)
+      jr.validateJob(id,false);
     } else {
       let msgArray = cs.messageHandle('#console', { username: 'localconsole', 'display-name': 'LocalConsole' }, myCommand, cs.getLocale())
       for (var msg in msgArray) {

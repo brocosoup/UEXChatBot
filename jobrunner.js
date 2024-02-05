@@ -104,7 +104,7 @@ export function acceptJob(jobID,context)
 
 export function finishJob(jobID,context,success)
 {
-    if (jobs[jobID].finished === false)
+    if (jobID <= (jobs.length - 1) && jobs[jobID].finished === false)
     {
         if (jobs[jobID].employee != null)
         {
@@ -123,13 +123,14 @@ export function finishJob(jobID,context,success)
             {
                 jobs[jobID].finished = true;
                 users = refreshRatings();
+                saveALL();
             }
             return ret;
         } else {
             return 1; //No employee defined
         }
     } else {
-        return 2; //Job already finished
+        return 2; //Job already finished or job not existing
     }
 }
 

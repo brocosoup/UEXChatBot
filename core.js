@@ -319,23 +319,29 @@ export function messageHandle(target, context, msg,myLocale)
 				res = getListCom(commandArgs[0], myLocale.listcom_limit,myLocale);
 			} else if (commandName.toLowerCase() == '!' + myLocale.propose_command )
 			{
-				if (commandArgs.length==2)
+				if (commandArgs.length==2 && !isNaN(commandArgs[1]))
 					res = jr.proposeJob(target,context,{title:commandArgs[0],gain:commandArgs[1]});
+				else
+					res = computeMessage(myLocale.propose_usage, [myLocale.propose_command]);
 			} else if (commandName.toLowerCase() == '!' + myLocale.accept_command )
 			{
 				log(`Accepting job ${commandArgs[0]} by ${context['display-name']}`,-1)
 				if (jr.acceptJob(commandArgs[0],context) == 0)
 					res = computeMessage(myLocale.job_accepted,[commandArgs[0],context['display-name'],jr.getUserRating(context['display-name'],1)])
 				else
-					log(`Error accepting job ${commandArgs[0]} by ${context['display-name']}`,-1)
+					res = computeMessage(myLocale.accept_usage, [myLocale.accept_command]);
 			} else if (commandName.toLowerCase() == '!' + myLocale.abandon_command )
 			{
-				if (jr.finishJob(commandArgs[0],context,false))
+				if (jr.finishJob(commandArgs[0],context,false) == 0)
 					res = computeMessage(myLocale.job_abandon,[commandArgs[0],context['display-name'],jr.getUserRating(context['display-name'],1)])
+				else
+					res = computeMessage(myLocale.abandon_usage, [myLocale.abandon_command]);
 			} else if (commandName.toLowerCase() == '!' + myLocale.complete_command )
 			{
-				if (jr.finishJob(commandArgs[0],context,true))
+				if (jr.finishJob(commandArgs[0],context,true) == 0)
 					res = computeMessage(myLocale.job_finish,[commandArgs[0],context['display-name'],jr.getUserRating(context['display-name'],1)])
+				else
+					res = computeMessage(myLocale.complete_usage, [myLocale.complete_command]);
 			}
 		} else {
 			const commandName = msg.trim();
@@ -377,6 +383,8 @@ export function messageHandle(target, context, msg,myLocale)
 						res = res + computeMessage(myLocale.list_job,[job,jobs[job].title,jobs[job].gain,jobs[job].jobgiver['display-name'],jr.getUserRating(jobs[job].jobgiver['display-name'])]) + "; "
 					}
 				}
+			} else if (commandName == '!' + myLocale.jobs_commands) {
+				res = computeMessage(myLocale.jobs_message,[myLocale.propose_command,myLocale.accept_command,myLocale.abandon_command,myLocale.complete_command]);
 			}
 		}
 		if (res != undefined) {
