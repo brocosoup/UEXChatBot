@@ -60,7 +60,7 @@ export default async function run() {
     } else if (myCommand.split(' ')[0] == 'unbanjob') {
       const id = myCommand.split(' ')[1].split(',')[0].replace(/^ */g, '').replace(/ *$/g, '');
       console.log('Unbanned job ' + id)
-      jr.validateJob(id,false);
+      jr.validateJob(id,true);
     } else {
       let msgArray = cs.messageHandle('#console', { username: 'localconsole', 'display-name': 'LocalConsole' }, myCommand, cs.getLocale())
       for (var msg in msgArray) {
