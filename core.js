@@ -350,7 +350,7 @@ export function messageHandle(target, context, msg,myLocale)
 			} else if (commandName == '!' + myLocale.shipbuy_command) {
 				res = computeMessage(myLocale.shipbuy_usage, [myLocale.shipbuy_command]);
 			} else if (commandName == '!' + myLocale.help_command) {
-				res = computeMessage(myLocale.help_message, [myLocale.shiprent_command, myLocale.shipbuy_command, myLocale.infosell_command, myLocale.infobuy_command, myLocale.coucou_command, myLocale.trade_command, myLocale.tadd_command]);
+				res = computeMessage(myLocale.help_message, [myLocale.shiprent_command, myLocale.shipbuy_command, myLocale.infosell_command, myLocale.infobuy_command, myLocale.coucou_command, myLocale.trade_command, myLocale.tadd_command,myLocale.jobs_commands]);
 			} else if (commandName == '!' + myLocale.infosell_command) {
 				res = computeMessage(myLocale.infosell_usage, [myLocale.infosell_command]);
 			} else if (commandName == '!' + myLocale.infobuy_command) {
@@ -384,7 +384,7 @@ export function messageHandle(target, context, msg,myLocale)
 					}
 				}
 			} else if (commandName == '!' + myLocale.jobs_commands) {
-				res = computeMessage(myLocale.jobs_message,[myLocale.propose_command,myLocale.accept_command,myLocale.abandon_command,myLocale.complete_command]);
+				res = computeMessage(myLocale.jobs_message,[myLocale.propose_command,myLocale.accept_command,myLocale.abandon_command,myLocale.complete_command,myLocale.joblist_commands]);
 			}
 		}
 		if (res != undefined) {

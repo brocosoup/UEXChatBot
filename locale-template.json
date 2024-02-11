@@ -49,8 +49,8 @@
 	"joblist_usage": "!%%1 <jobid>",
 
 	"coucou_message": "Hé coucou toi ! Je suis prêt, tu peux afficher mes commandes avec !%%1",
-	"help_message": "Commandes: !%%1, !%%2, !%%3, !%%4, !%%6 et !%%7",
-	"jobs_message": "Job Commandes: !%%1, !%%2, !%%3, !%%4",
+	"help_message": "Commandes: !%%1, !%%2, !%%3, !%%4, !%%6, !%%7 et !%%8",
+	"jobs_message": "Job Commandes: !%%1, !%%2, !%%3, !%%4, !%%5",
 
 	"commodity_get_buy": "%%1 s'achète %%3 aUEC à %%2",
 	"commodity_set_buy": "%%1 s'achète désormais %%3 aUEC à %%2",	
