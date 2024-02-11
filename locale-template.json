@@ -28,6 +28,12 @@
 
 	"not_found": "Désolé, je n'ai rien trouvé",
 
+	"jobs_avail": "Les jobs suivants sont disponibles: ",
+	"list_job": "ID %%1, '%%2' pour un gain de %%3 aUEC - Proposé par %%4(%%5)",
+	"job_accepted": "Job %%1 accepté par %%2(%%3)",
+	"job_abandon": "Job %%1 abandonné par %%2(%%3)",
+	"job_finish": "Job %%1 complété par %%2(%%3)",
+
 	"shiprent_usage": "!%%1 <ship>",
 	"shipbuy_usage": "!%%1 <ship>",
 	"trade_usage": "!%%1 <commodity>",
@@ -36,9 +42,15 @@
 	"listloc_usage": "!%%1 <location>",
 	"listcom_usage": "!%%1 <location>",
 	"update_usage": "!%%1 <location>,<buy/sell>,<commodity>,<price> ",
+	"propose_usage": "!%%1 <job title>,<reward>",
+	"accept_usage": "!%%1 <jobid>",
+	"abandon_usage": "!%%1 <jobid>",
+	"complete_usage": "!%%1 <jobid>",
+	"joblist_usage": "!%%1 <jobid>",
 
 	"coucou_message": "Hé coucou toi ! Je suis prêt, tu peux afficher mes commandes avec !%%1",
-	"help_message": "Commandes: !%%1, !%%2, !%%3, !%%4, !%%6 et !%%7",
+	"help_message": "Commandes: !%%1, !%%2, !%%3, !%%4, !%%6, !%%7 et !%%8",
+	"jobs_message": "Job Commandes: !%%1, !%%2, !%%3, !%%4 et !%%5",
 
 	"commodity_get_buy": "%%1 s'achète %%3 aUEC à %%2",
 	"commodity_set_buy": "%%1 s'achète désormais %%3 aUEC à %%2",	
@@ -62,5 +74,11 @@
 	"trade_command": "route",
 	"coucou_command": "sc_cc",
 	"listloc_command": "location",
-	"listcom_command": "ressource"
+	"listcom_command": "ressource",
+	"propose_command": "joboffer",
+	"accept_command": "jobaccept",
+	"abandon_command": "jobabandon",
+	"complete_command": "jobfinish",
+	"joblist_commands": "joblist",
+	"jobs_commands": "jobs"
 }

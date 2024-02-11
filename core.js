@@ -5,17 +5,15 @@ import server from './server.cjs';
 import { exit } from 'node:process';
 import {log, setLogLevel} from './logger.cjs';
 import { addToDatabase,refreshAPI,getShipPrice,getCommoditiesPrice/*,setLocale*/,computeMessage,saveData, getListLoc,getListCom } from './manageData.cjs';
-//import console from './console.js';
+import * as jr from './jobrunner.js';
 
-setLogLevel(0); //-1 for debug, 0 for info, 1 for warning, 2 for errors only
+//import console from './console.js';
 
 function initJSONFile(file) {
 	if (!fs.existsSync(file + '.json')) {
 		fs.writeFileSync(file + '.json', fs.readFileSync(file + '-template.json'))
 	}
 }
-
-var twitch_refresh_token;
 
 initJSONFile('locale');
 let rawlocale = fs.readFileSync('locale.json');
@@ -77,7 +75,7 @@ export function getsetChannels(channels = twitch_options.channels)
 {
 	config.channels = channels;
 	twitch_options.channels = channels;
-	log('chan set to: ' + channels);
+	log('chan set to: ' + channels,-1);
 	return twitch_options.channels;
 }
 
@@ -100,8 +98,9 @@ function alert(err)
 }
 
 setInterval(checkAuth, 1000 * 60 * 10);
-log('Checking for oauth validity every 10 minutes',0);
+log('Checking for oauth validity every 10 minutes',-1);
 setInterval(saveData,1000*60*1);
+setInterval(jr.saveALL,1000*60*1);
 
 var listTimeout = [];
 function clearRefreshs()
@@ -120,7 +119,7 @@ function checkAuth()
 			'Authorization': 'OAuth ' + config.identity.password.substr('oauth:'.length)
 		},
 	};
-	log('Checking for our oauth2 token validity',-1)
+	log('Checking for our oauth2 token validity now',-1)
 	let api = [
 		'https://id.twitch.tv/oauth2/validate'
 	];
@@ -138,7 +137,7 @@ function checkAuth()
 				refreshAuth();
 				//alert('Login authentication failed');
 			} else {
-				twitch_refresh_token = Math.round(results[0].expires_in) - 30;
+				var twitch_refresh_token = Math.round(results[0].expires_in) - 30;
 				log('I will refresh the token in ' + Math.round(twitch_refresh_token/60) + ' minutes',-1);
 				clearRefreshs();
 				listTimeout.push(setTimeout(refreshAuth, twitch_refresh_token * 1000));
@@ -193,9 +192,9 @@ function refreshAuth()
 				alert('Refresh token failed');
 			} else {
 				config.identity.password = 'oauth:' + results[0].access_token;
-				log('oauth:' + results[0].access_token,-1)
+				log('access_token:' + results[0].access_token,0)
 				config.refreshToken = results[0].refresh_token;
-				log('oauth:' + results[0].refresh_token,-1)
+				log('refresh_token:' + results[0].refresh_token,0)
 				twitch_options = {
 					identity: {
 						'username': config.identity.username,
@@ -217,7 +216,7 @@ export function reconnect_twitch()
 {
 	fs.writeFileSync("settings.json", JSON.stringify(config))
 	client.disconnect();
-	log('Twitch Client closed',1);
+	log('Twitch Client closed',-1);
 	client = new tmi.client(twitch_options);
 	client.on('message', onMessageHandler);
 	client.on('connected', onConnectedHandler);
@@ -259,7 +258,7 @@ function sendMe(target, message, context) {
 
 // Called every time the bot connects to Twitch chat
 function onConnectedHandler(addr, port) {
-	log(`Connected to ${addr}:${port}`,0);
+	log(`Connected to ${addr}:${port}`,-1);
 }
 
 export function getLocale(target='')
@@ -286,9 +285,10 @@ export function getClient()
 }
 export function messageHandle(target, context, msg,myLocale)
 {
+	log(target + ': @' + context.username + ': ' + msg,-2);
 	if (msg.substr(0, 1) == '!') // Do we have a command ?
 	{
-		log(target + ': @' + context.username + ': ' + msg,-1);
+		log(target + ': @' + context.username + ': ' + msg,0);
 		const posDelim = msg.indexOf(' ');
 		var res = '';
 		if (posDelim != -1) {
@@ -317,6 +317,31 @@ export function messageHandle(target, context, msg,myLocale)
 			} else if (commandName.toLowerCase() == '!' + myLocale.listcom_command )
 			{
 				res = getListCom(commandArgs[0], myLocale.listcom_limit,myLocale);
+			} else if (commandName.toLowerCase() == '!' + myLocale.propose_command )
+			{
+				if (commandArgs.length==2 && !isNaN(commandArgs[1]))
+					res = jr.proposeJob(target,context,{title:commandArgs[0],gain:commandArgs[1]});
+				else
+					res = computeMessage(myLocale.propose_usage, [myLocale.propose_command]);
+			} else if (commandName.toLowerCase() == '!' + myLocale.accept_command )
+			{
+				log(`Accepting job ${commandArgs[0]} by ${context['display-name']}`,-1)
+				if (jr.acceptJob(commandArgs[0],context) == 0)
+					res = computeMessage(myLocale.job_accepted,[commandArgs[0],context['display-name'],jr.getUserRating(context['display-name'],1)])
+				else
+					res = computeMessage(myLocale.accept_usage, [myLocale.accept_command]);
+			} else if (commandName.toLowerCase() == '!' + myLocale.abandon_command )
+			{
+				if (jr.finishJob(commandArgs[0],context,false) == 0)
+					res = computeMessage(myLocale.job_abandon,[commandArgs[0],context['display-name'],jr.getUserRating(context['display-name'],1)])
+				else
+					res = computeMessage(myLocale.abandon_usage, [myLocale.abandon_command]);
+			} else if (commandName.toLowerCase() == '!' + myLocale.complete_command )
+			{
+				if (jr.finishJob(commandArgs[0],context,true) == 0)
+					res = computeMessage(myLocale.job_finish,[commandArgs[0],context['display-name'],jr.getUserRating(context['display-name'],1)])
+				else
+					res = computeMessage(myLocale.complete_usage, [myLocale.complete_command]);
 			}
 		} else {
 			const commandName = msg.trim();
@@ -325,7 +350,7 @@ export function messageHandle(target, context, msg,myLocale)
 			} else if (commandName == '!' + myLocale.shipbuy_command) {
 				res = computeMessage(myLocale.shipbuy_usage, [myLocale.shipbuy_command]);
 			} else if (commandName == '!' + myLocale.help_command) {
-				res = computeMessage(myLocale.help_message, [myLocale.shiprent_command, myLocale.shipbuy_command, myLocale.infosell_command, myLocale.infobuy_command, myLocale.coucou_command, myLocale.trade_command, myLocale.tadd_command]);
+				res = computeMessage(myLocale.help_message, [myLocale.shiprent_command, myLocale.shipbuy_command, myLocale.infosell_command, myLocale.infobuy_command, myLocale.coucou_command, myLocale.trade_command, myLocale.tadd_command,myLocale.jobs_commands]);
 			} else if (commandName == '!' + myLocale.infosell_command) {
 				res = computeMessage(myLocale.infosell_usage, [myLocale.infosell_command]);
 			} else if (commandName == '!' + myLocale.infobuy_command) {
@@ -340,6 +365,27 @@ export function messageHandle(target, context, msg,myLocale)
 				res = computeMessage(myLocale.listloc_usage, [myLocale.listloc_command]);
 			} else if (commandName == '!' + myLocale.listcom_command) {
 				res = computeMessage(myLocale.listcom_usage, [myLocale.listcom_command]);
+			} else if (commandName == '!' + myLocale.propose_command) {
+				res = computeMessage(myLocale.propose_usage, [myLocale.propose_command]);
+			} else if (commandName == '!' + myLocale.accept_command) {
+				res = computeMessage(myLocale.accept_usage, [myLocale.accept_command]);
+			} else if (commandName == '!' + myLocale.abandon_command) {
+				res = computeMessage(myLocale.abandon_usage, [myLocale.abandon_command]);
+			} else if (commandName == '!' + myLocale.complete_command) {
+				res = computeMessage(myLocale.complete_usage, [myLocale.complete_command]);
+			} else if (commandName == '!' + myLocale.joblist_commands) {
+				const jobs = jr.getJobs();					
+				for (var job in jobs)
+				{
+					if(jobs[job].validated && !jobs[job].finished && jobs[job].employee === null)
+					{
+						if (res == "")
+							res = computeMessage(myLocale.jobs_avail);
+						res = res + computeMessage(myLocale.list_job,[job,jobs[job].title,jobs[job].gain,jobs[job].jobgiver['display-name'],jr.getUserRating(jobs[job].jobgiver['display-name'])]) + "; "
+					}
+				}
+			} else if (commandName == '!' + myLocale.jobs_commands) {
+				res = computeMessage(myLocale.jobs_message,[myLocale.propose_command,myLocale.accept_command,myLocale.abandon_command,myLocale.complete_command,myLocale.joblist_commands]);
 			}
 		}
 		if (res != undefined) {
