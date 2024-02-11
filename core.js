@@ -374,12 +374,13 @@ export function messageHandle(target, context, msg,myLocale)
 			} else if (commandName == '!' + myLocale.complete_command) {
 				res = computeMessage(myLocale.complete_usage, [myLocale.complete_command]);
 			} else if (commandName == '!' + myLocale.joblist_commands) {
-				res = computeMessage(myLocale.jobs_avail);
-				const jobs = jr.getJobs();
+				const jobs = jr.getJobs();					
 				for (var job in jobs)
 				{
 					if(jobs[job].validated && !jobs[job].finished && jobs[job].employee === null)
 					{
+						if (res == "")
+							res = computeMessage(myLocale.jobs_avail);
 						res = res + computeMessage(myLocale.list_job,[job,jobs[job].title,jobs[job].gain,jobs[job].jobgiver['display-name'],jr.getUserRating(jobs[job].jobgiver['display-name'])]) + "; "
 					}
 				}
