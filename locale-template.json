@@ -46,7 +46,7 @@
 	"accept_usage": "!%%1 <jobid>",
 	"abandon_usage": "!%%1 <jobid>",
 	"complete_usage": "!%%1 <jobid>",
-	"joblist_usage": "!%%1 <jobid>",
+	"joblist_usage": "!%%1 avail/self",
 
 	"coucou_message": "Hé coucou toi ! Je suis prêt, tu peux afficher mes commandes avec !%%1",
 	"help_message": "Commandes: !%%1, !%%2, !%%3, !%%4, !%%6, !%%7 et !%%8",

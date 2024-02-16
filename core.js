@@ -342,7 +342,37 @@ export function messageHandle(target, context, msg,myLocale)
 					res = computeMessage(myLocale.job_finish,[commandArgs[0],context['display-name'],jr.getUserRating(context['display-name'],1)])
 				else
 					res = computeMessage(myLocale.complete_usage, [myLocale.complete_command]);
-			}
+			} else if (commandName.toLowerCase() == '!' + myLocale.joblist_commands) {
+				const jobs = jr.getJobs();
+				var myEmployee = null;
+				if (commandArgs[0] != null && commandArgs[0].toLowerCase() === 'self')
+				{
+					myEmployee = context['display-name'];
+					
+				}			
+				for (var job in jobs)
+				{
+					if(jobs[job].validated && !jobs[job].finished && (jobs[job].employee === null || jobs[job].employee['display-name'] === myEmployee))
+					{
+						if (jobs[job].employee === null && myEmployee === null) 
+						{
+							if (res == "")
+							{
+								res = computeMessage(myLocale.jobs_avail);
+							}
+							res = res + computeMessage(myLocale.list_job,[job,jobs[job].title,jobs[job].gain,jobs[job].jobgiver['display-name'],jr.getUserRating(jobs[job].jobgiver['display-name'])]) + "; "
+						}
+						if (jobs[job].employee != null && jobs[job].employee['display-name'] === myEmployee)
+						{
+							if (res == "")
+							{
+								res = computeMessage(myLocale.jobs_avail);
+							}
+							res = res + computeMessage(myLocale.list_job,[job,jobs[job].title,jobs[job].gain,jobs[job].jobgiver['display-name'],jr.getUserRating(jobs[job].jobgiver['display-name'])]) + "[ACCEPTED]; "
+						}
+					}
+				}
+			} 
 		} else {
 			const commandName = msg.trim();
 			if (commandName == '!' + myLocale.shiprent_command) {
@@ -373,19 +403,10 @@ export function messageHandle(target, context, msg,myLocale)
 				res = computeMessage(myLocale.abandon_usage, [myLocale.abandon_command]);
 			} else if (commandName == '!' + myLocale.complete_command) {
 				res = computeMessage(myLocale.complete_usage, [myLocale.complete_command]);
-			} else if (commandName == '!' + myLocale.joblist_commands) {
-				const jobs = jr.getJobs();					
-				for (var job in jobs)
-				{
-					if(jobs[job].validated && !jobs[job].finished && jobs[job].employee === null)
-					{
-						if (res == "")
-							res = computeMessage(myLocale.jobs_avail);
-						res = res + computeMessage(myLocale.list_job,[job,jobs[job].title,jobs[job].gain,jobs[job].jobgiver['display-name'],jr.getUserRating(jobs[job].jobgiver['display-name'])]) + "; "
-					}
-				}
 			} else if (commandName == '!' + myLocale.jobs_commands) {
 				res = computeMessage(myLocale.jobs_message,[myLocale.propose_command,myLocale.accept_command,myLocale.abandon_command,myLocale.complete_command,myLocale.joblist_commands]);
+			} else if (commandName == '!' + myLocale.joblist_commands) {
+				res = computeMessage(myLocale.joblist_usage,[myLocale.joblist_commands]);
 			}
 		}
 		if (res != undefined) {
