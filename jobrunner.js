@@ -183,8 +183,16 @@ function getUID(user,myUsers)
 
 export function getRating(uid,myUsers,weight_jobgiver = 1,weight_employee = 1)
 {
-    const employerRating = myUsers[uid].nb_jobgiver_success / (myUsers[uid].nb_jobgiver_fail + myUsers[uid].nb_jobgiver_success);
-    const employeeRating = myUsers[uid].nb_employee_success / (myUsers[uid].nb_employee_fail + myUsers[uid].nb_employee_success);
+    var employerRating = myUsers[uid].nb_jobgiver_success / (myUsers[uid].nb_jobgiver_fail + myUsers[uid].nb_jobgiver_success);
+    var employeeRating = myUsers[uid].nb_employee_success / (myUsers[uid].nb_employee_fail + myUsers[uid].nb_employee_success);
+    if (isNaN(employeeRating))
+    {
+        employeeRating = 1
+    }
+    if (isNaN(employerRating))
+    {
+        employerRating = 1
+    }   
     return ((weight_jobgiver * employerRating+ weight_employee * employeeRating)/(weight_jobgiver + weight_employee));
 }
 
