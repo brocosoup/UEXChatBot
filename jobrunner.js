@@ -199,6 +199,11 @@ export function getUserRating(name,rate = 1)
     return rating;
 }
 
+export function getUsers()  
+{
+    return users;
+}
+
 export function saveALL(force = false)
 {
     saveJSON('jobs',JSON.stringify(jobs));

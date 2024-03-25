@@ -61,6 +61,11 @@ export default async function run() {
       const id = myCommand.split(' ')[1].split(',')[0].replace(/^ */g, '').replace(/ *$/g, '');
       console.log('Unbanned job ' + id)
       jr.validateJob(id,true);
+    } else if (myCommand.split(' ')[0] == 'rating') {
+      const user = myCommand.split(' ')[1].split(',')[0].replace(/^ */g, '').replace(/ *$/g, '');
+      console.log('Rating of user ' + user + ' ' + jr.getUserRating(user,1))
+    } else if (myCommand == 'users') {
+      console.log(jr.getUsers())
     } else {
       let msgArray = cs.messageHandle('#console', { username: 'localconsole', 'display-name': 'LocalConsole' }, myCommand, cs.getLocale())
       for (var msg in msgArray) {
